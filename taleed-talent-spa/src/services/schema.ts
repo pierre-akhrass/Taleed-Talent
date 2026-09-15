@@ -18,13 +18,13 @@ const summary = z.object({ organizationId: id, organizationName: small, month, p
 const stringTriple = z.tuple([text, text, text]);
 const conversation = z.object({ id, ownerId: id, month, alias: small, date: dateOrBlank, answers: stringTriple, goal: text, nextStep: text, followup: dateOrBlank, status: z.enum(['draft', 'complete']), updatedAt: small }).strict();
 const wellbeing = z.object({ id, ownerId: id, month, scores: z.record(z.enum(dimensions), z.number().int().min(1).max(10).nullable()), focus: z.union([z.enum(dimensions), z.literal('')]), actions: z.tuple([small, small, small]), status: z.enum(['draft', 'complete']), revision: z.number().int().positive(), updatedAt: small }).strict();
-const user = z.object({ id, name: small, email: z.email(), orgId: id, role: z.enum(['leader', 'champion', 'taleed', 'admin']) }).strict();
+const user = z.object({ id, name: small, email: z.string().email(), orgId: id, role: z.enum(['leader', 'champion', 'taleed', 'admin']) }).strict();
 const resource = z.object({ id, name: small, theme: z.union([z.enum(themes), z.literal('general')]), version: z.number().int().positive(), description: text, dependency: text, status: z.enum(['draft', 'approved', 'retired']) }).strict();
 const dict = <T extends z.ZodType>(schema: T) => z.record(id, schema);
 export const dataSchema = z.object({
     planning: z.object({ plans: dict(plan), drafts: dict(z.object({ id, ownerId: id, orgId: id, month, title: small, theme: z.enum(themes), selected: z.record(z.enum(scopes), z.string().max(180)), schedules: dict(draftSchedule), step: z.number().int().min(0).max(3) }).strict()), occurrences: dict(occurrence), snapshots: dict(snapshot) }).strict(),
     privateData: z.object({ conversations: dict(conversation), wellbeing: dict(wellbeing) }).strict(),
-    organization: z.object({ organizations: dict(z.object({ id, name: small, sector: small, city: small }).strict()), users: dict(user), invitations: dict(z.object({ id, orgId: id, name: small, email: z.email(), status: z.enum(['pending', 'accepted', 'revoked', 'expired']), expiresAt: small }).strict()), summaries: dict(z.object({ id, payload: summary, status: z.enum(['shared', 'superseded', 'withdrawn']) }).strict()) }).strict(),
+    organization: z.object({ organizations: dict(z.object({ id, name: small, sector: small, city: small }).strict()), users: dict(user), invitations: dict(z.object({ id, orgId: id, name: small, email: z.string().email(), status: z.enum(['pending', 'accepted', 'revoked', 'expired']), expiresAt: small }).strict()), summaries: dict(z.object({ id, payload: summary, status: z.enum(['shared', 'superseded', 'withdrawn']) }).strict()) }).strict(),
     catalogue: z.object({ activities: dict(activitySchema), resources: dict(resource), bookmarks: dict(z.array(id).max(1000)) }).strict(),
     preferences: z.object({ month, rtl: z.boolean(), weekStart: z.union([z.literal(0), z.literal(1), z.literal(6)]), reminders: z.boolean() }).strict(),
 }).strict().superRefine((data, ctx) => {
@@ -44,7 +44,7 @@ export const dataSchema = z.object({
             ctx.addIssue({ code: 'custom', message: 'A closed snapshot contains invalid occurrence references.' });
     }
     for (const w of Object.values(data.privateData.wellbeing))
-        if (w.status === 'complete' && wheelErrors(w).length)
+        if (w.status === 'complete' && wheelErrors(w as unknown as Parameters<typeof wheelErrors>[0]).length)
             ctx.addIssue({ code: 'custom', message: 'Completed well-being records need nine ratings, a focus and three actions.' });
     for (const share of Object.values(data.organization.summaries)) {
         const p = share.payload;

@@ -9,7 +9,7 @@ import { actions } from '../../app/slices';
 import { Button, ErrorSummary, Field, Notice } from '../../components/UI';
 import { HeroArt } from '../home/Home';
 import { uid } from '../../domain/logic';
-const signupSchema = z.object({ name: z.string().trim().min(2, 'Enter at least two characters.').max(80), email: z.email('Enter a valid demo email.'), password: z.string().min(10, 'Use at least 10 characters for this simulated form.'), accept: z.boolean().refine(value => value, 'Confirm you will only use fictional information.') });
+const signupSchema = z.object({ name: z.string().trim().min(2, 'Enter at least two characters.').max(80), email: z.string().email('Enter a valid demo email.'), password: z.string().min(10, 'Use at least 10 characters for this simulated form.'), accept: z.boolean().refine(value => value, 'Confirm you will only use fictional information.') });
 type SignupFields = {
     name: string;
     email: string;

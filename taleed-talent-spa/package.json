@@ -23,30 +23,30 @@
     "format:check": "prettier --check src tests e2e scripts"
   },
   "dependencies": {
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "@hookform/resolvers": "latest",
     "@reduxjs/toolkit": "2.12.0",
+    "lucide-react": "latest",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-hook-form": "latest",
     "react-redux": "latest",
     "react-router-dom": "latest",
-    "react-hook-form": "latest",
-    "@hookform/resolvers": "latest",
-    "zod": "latest",
-    "lucide-react": "latest"
+    "zod": "latest"
   },
   "devDependencies": {
+    "@axe-core/playwright": "latest",
+    "@playwright/test": "latest",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/user-event": "latest",
+    "@types/node": "latest",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "@vitejs/plugin-react": "latest",
+    "jsdom": "29.0.1",
+    "prettier": "latest",
     "typescript": "latest",
     "vite": "latest",
-    "@vitejs/plugin-react": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "@types/node": "latest",
-    "vitest": "latest",
-    "jsdom": "latest",
-    "@testing-library/react": "latest",
-    "@testing-library/jest-dom": "latest",
-    "@testing-library/user-event": "latest",
-    "@playwright/test": "latest",
-    "@axe-core/playwright": "latest",
-    "prettier": "latest"
+    "vitest": "latest"
   }
 }
