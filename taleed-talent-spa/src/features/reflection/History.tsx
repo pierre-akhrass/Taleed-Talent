@@ -1,0 +1,13 @@
+import { useState } from 'react';
+import { Archive, ArrowUpRight, FileText } from 'lucide-react';
+import { useAppSelector } from '../../app/hooks';
+import { selectOwnSnapshots } from '../../app/selectors';
+import { monthLabel, planMetrics } from '../../domain/logic';
+import { ActionLink, Badge, Card, Empty, PageHeader, PrivateBadge } from '../../components/UI';
+export default function History() {
+    const snapshots = useAppSelector(selectOwnSnapshots);
+    const [month, setMonth] = useState('all');
+    const rows = [...snapshots].filter(s => month === 'all' || s.month === month).sort((a, b) => b.month.localeCompare(a.month) || b.revision - a.revision);
+    return <><PageHeader eyebrow="Reflect & repeat" title="A record of your progress" description="Closed months stay exactly as they were. Corrections create a new revision, never a rewritten history." action={<PrivateBadge />}/><div className="toolbar"><label className="inline-label">Period <select aria-label="History period" value={month} onChange={e => setMonth(e.target.value)}><option value="all">All months</option>{[...new Set(snapshots.map(s => s.month))].sort().reverse().map(m => <option key={m} value={m}>{monthLabel(m)}</option>)}</select></label><span className="muted">{rows.length} saved {rows.length === 1 ? 'snapshot' : 'snapshots'}</span></div>{!rows.length ? <Card><Empty title="Your story starts with a closed month" description="Complete your monthly reflection to save an honest record of what happened—even when some work is still incomplete." action={<ActionLink to="/plan">My monthly plans</ActionLink>}/></Card> : <div className="stack">{rows.map(s => { const m = planMetrics(s.plan, s.occurrences), latest = !snapshots.some(x => x.planId === s.planId && x.revision > s.revision); return <Card key={s.id} className="history-card"><div className="between"><div className="row"><span className="icon-tile"><Archive size={20}/></span><div><p className="eyebrow">{monthLabel(s.month)}</p><h2>{s.plan.title}</h2></div></div><Badge tone={latest ? 'success' : 'neutral'}>{latest ? 'Latest closed revision' : 'Earlier revision'} · v{s.revision}</Badge></div><div className="mini-stats"><span><strong>{m.completed}/{m.eligible}</strong> eligible occurrences completed</span><span><strong>{m.coverage.length}/3</strong> scopes delivered</span><span><strong>{m.rate === null ? '—' : `${m.rate}%`}</strong> follow-through</span></div><div className="between"><span className="muted">Closed {new Date(s.closedAt).toLocaleDateString('en-GB')}</span><div className="row"><ActionLink secondary to={`/plan/${s.planId}`}>Open plan <ArrowUpRight size={16}/></ActionLink><ActionLink to={`/reports/plan/${s.id}`}><FileText size={16}/>View snapshot</ActionLink></div></div></Card>; })}</div>}</>;
+}
+

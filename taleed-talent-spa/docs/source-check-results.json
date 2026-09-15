@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-09-15T09:59:41.077Z",
+  "typescript": "5.8.3",
+  "files": 27,
+  "errors": [],
+  "status": "PASS",
+  "scope": "TS/TSX syntax and static relative imports only; no dependency-aware typecheck or browser execution."
+}

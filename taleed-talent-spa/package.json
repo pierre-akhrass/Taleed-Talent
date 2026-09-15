@@ -1,0 +1,52 @@
+{
+  "name": "taleed-talent-workspace",
+  "private": true,
+  "version": "1.0.0-demo",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:domain": "node scripts/test-domain.mjs",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm test && npm run build",
+    "versions": "node scripts/record-versions.mjs",
+    "bootstrap:latest": "node scripts/bootstrap.mjs",
+    "check:source": "node scripts/check-source.mjs",
+    "format": "prettier --write src tests e2e scripts docs *.md *.json *.ts",
+    "format:check": "prettier --check src tests e2e scripts"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "@reduxjs/toolkit": "2.12.0",
+    "react-redux": "latest",
+    "react-router-dom": "latest",
+    "react-hook-form": "latest",
+    "@hookform/resolvers": "latest",
+    "zod": "latest",
+    "lucide-react": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "vite": "latest",
+    "@vitejs/plugin-react": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/node": "latest",
+    "vitest": "latest",
+    "jsdom": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/user-event": "latest",
+    "@playwright/test": "latest",
+    "@axe-core/playwright": "latest",
+    "prettier": "latest"
+  }
+}

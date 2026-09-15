@@ -1,0 +1,16 @@
+/* PROVISIONAL APPLICATION TOKENS. Navy/blue/amber echo the supplied prototype's
+   preview wrapper (#0a1d5c, #1741c9, #f0a93b), not a verified official brand kit.
+   Replace here after Taleed product-design approval. No licensed fonts bundled. */
+:root{
+ --navy:#0a1d5c;--blue:#1741c9;--blue-hover:#12339e;--blue-soft:#edf2ff;
+ --amber:#f0a93b;--ink:#182547;--muted:#64718b;--faint:#929bad;
+ --canvas:#f5f7fb;--surface:#fff;--border:#e3e8f0;--success:#217152;
+ --success-soft:#edf8f1;--warning:#895511;--warning-soft:#fff8e8;
+ --error:#b42a39;--error-soft:#fff0f1;--focus:#1741c9;
+ --care:#137863;--care-soft:#e8f5f0;--develop:#1741c9;--develop-soft:#edf2ff;
+ --enable:#8c5915;--enable-soft:#fff5e4;--recognition:#7351ab;--recognition-soft:#f3edfc;
+ --radius-lg:20px;--accent:#f0a93b;--radius:16px;--radius-sm:10px;--shadow:0 3px 18px #0a1d5c04;
+ --sidebar:250px;--ribbon:30px;
+ font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ color:var(--ink);background:var(--canvas);font-synthesis:none;text-rendering:optimizeLegibility;
+}

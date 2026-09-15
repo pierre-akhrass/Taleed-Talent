@@ -1,0 +1,10 @@
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');process.chdir(root);
+const npm=process.platform==='win32'?'npm.cmd':'npm';
+const graph=JSON.parse(execFileSync(npm,['ls','--depth=0','--json'],{encoding:'utf8',shell:process.platform==='win32'}));
+const pkg=JSON.parse(readFileSync('package.json','utf8'));
+const result={recordedAt:new Date().toISOString(),node:process.versions.node,platform:process.platform,packages:Object.fromEntries([...Object.keys(pkg.dependencies),...Object.keys(pkg.devDependencies)].map(n=>[n,graph.dependencies?.[n]?.version??'NOT INSTALLED']))};
+mkdirSync('docs',{recursive:true});writeFileSync('docs/installed-versions.json',JSON.stringify(result,null,2)+'\n');console.log('Actual installed versions recorded in docs/installed-versions.json');

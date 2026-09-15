@@ -1,0 +1,174 @@
+{
+  "checkedAt": "2026-09-15T09:59:41.522Z",
+  "node": "22.16.0",
+  "typescript": "5.8.3",
+  "passed": 41,
+  "failed": 0,
+  "scope": "Executed pure domain functions and synthetic seed only. React, Redux, Zod, browser interactions and dependency integration are NOT covered by this run.",
+  "results": [
+    {
+      "name": "Catalogue contains 72 explicitly illustrative/reference-equivalent cards",
+      "status": "PASS"
+    },
+    {
+      "name": "Each theme/scope contains six cards",
+      "status": "PASS"
+    },
+    {
+      "name": "Seven source metadata records exist",
+      "status": "PASS"
+    },
+    {
+      "name": "Leap day 2028 is valid",
+      "status": "PASS"
+    },
+    {
+      "name": "Non-leap day 2026 is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Impossible April 31 is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Month range and format are validated",
+      "status": "PASS"
+    },
+    {
+      "name": "February leap-year end is correct",
+      "status": "PASS"
+    },
+    {
+      "name": "Calendar supports four displayed weeks",
+      "status": "PASS"
+    },
+    {
+      "name": "Calendar supports five displayed weeks",
+      "status": "PASS"
+    },
+    {
+      "name": "Calendar supports six displayed weeks",
+      "status": "PASS"
+    },
+    {
+      "name": "Monday week start is respected",
+      "status": "PASS"
+    },
+    {
+      "name": "Year rollover works",
+      "status": "PASS"
+    },
+    {
+      "name": "Weekly occurrence dates are deterministic",
+      "status": "PASS"
+    },
+    {
+      "name": "Daily recurrence covers all days, including weekends",
+      "status": "PASS"
+    },
+    {
+      "name": "One-off creates exactly one occurrence",
+      "status": "PASS"
+    },
+    {
+      "name": "Weekly schedule requires chosen weekdays",
+      "status": "PASS"
+    },
+    {
+      "name": "Schedules cannot cross the selected month",
+      "status": "PASS"
+    },
+    {
+      "name": "One-off is rejected outside Develop",
+      "status": "PASS"
+    },
+    {
+      "name": "No-matching-weekday schedule is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Generated occurrence identities are stable on repeated expansion",
+      "status": "PASS"
+    },
+    {
+      "name": "One activity per scope satisfies Pick-3",
+      "status": "PASS"
+    },
+    {
+      "name": "Three choices from one scope are rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Mixed theme selections are rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Retired content is rejected in a new plan",
+      "status": "PASS"
+    },
+    {
+      "name": "Cancelled occurrence excluded: two of four = 50%",
+      "status": "PASS"
+    },
+    {
+      "name": "Delivered scopes are two, not three selected cards",
+      "status": "PASS"
+    },
+    {
+      "name": "No scheduled activity has a null rate, not 0 or 100",
+      "status": "PASS"
+    },
+    {
+      "name": "Zero eligible denominator is also null",
+      "status": "PASS"
+    },
+    {
+      "name": "Higher closed revision replaces—not adds to—summary",
+      "status": "PASS"
+    },
+    {
+      "name": "Summary excludes private notes, custom titles and identity",
+      "status": "PASS"
+    },
+    {
+      "name": "Summary filters other company and month",
+      "status": "PASS"
+    },
+    {
+      "name": "Blank well-being dimensions have no total",
+      "status": "PASS"
+    },
+    {
+      "name": "Eight ratings do not generate a total",
+      "status": "PASS"
+    },
+    {
+      "name": "Source numeric example totals 54",
+      "status": "PASS"
+    },
+    {
+      "name": "Min/max numeric totals are 9 and 90",
+      "status": "PASS"
+    },
+    {
+      "name": "Fractional, zero and out-of-range scores are rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Complete reflection requires explicit focus and three actions",
+      "status": "PASS"
+    },
+    {
+      "name": "Published-content edits cannot mutate a plan copy",
+      "status": "PASS"
+    },
+    {
+      "name": "CSV neutralizes formula-leading characters and escapes quotes",
+      "status": "PASS"
+    },
+    {
+      "name": "Calendar export excludes cancelled/private notes",
+      "status": "PASS"
+    }
+  ]
+}
