@@ -1,0 +1,36 @@
+[
+  {
+    "id": "demo-develop-individual-initiative",
+    "title": "Choose one skill to practise",
+    "description": "Select one useful skill and make a small plan to practise it during the month.",
+    "steps": [
+      "Choose one skill that would help in your current work.",
+      "Identify one realistic opportunity to practise it.",
+      "Reflect briefly on what you learned and what to try next."
+    ],
+    "theme": "develop",
+    "scope": "individual",
+    "version": 1,
+    "sourceKind": "custom",
+    "sourceRef": "Admin demonstration draft; replace with approved source wording.",
+    "resourceId": "s2",
+    "status": "draft"
+  },
+  {
+    "id": "demo-develop-team-learning",
+    "title": "Share one useful lesson",
+    "description": "Create a short team moment to share something useful learned from recent work.",
+    "steps": [
+      "Choose a recent lesson, success, or challenge to share.",
+      "Invite the team to discuss how the lesson could help future work.",
+      "Agree one small action to test before the next team check-in."
+    ],
+    "theme": "develop",
+    "scope": "team",
+    "version": 1,
+    "sourceKind": "custom",
+    "sourceRef": "Admin demonstration draft; replace with approved source wording.",
+    "resourceId": "s2",
+    "status": "draft"
+  }
+]

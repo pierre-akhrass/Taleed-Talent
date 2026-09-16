@@ -10,8 +10,20 @@ let bootData = makeSeed();
 export const repository = new LocalRepository({ getItem: k => localStorage.getItem(k), setItem: (k, v) => localStorage.setItem(k, v), removeItem: k => localStorage.removeItem(k) }, uid('tab'));
 try {
     const old = repository.read();
-    if (old)
+    if (old) {
         bootData = old.data;
+        const fresh = makeSeed();
+        let catalogueChanged = false;
+        for (const [id, activity] of Object.entries(fresh.catalogue.activities)) {
+            const existing = bootData.catalogue.activities[id];
+            if (existing && existing.version === 1 && existing.sourceKind !== 'custom' && (existing.sourceRef.includes('Synthetic demonstration') || existing.sourceRef.includes('Title referenced'))) {
+                bootData.catalogue.activities[id] = activity;
+                catalogueChanged = true;
+            }
+        }
+        if (catalogueChanged)
+            repository.save(bootData);
+    }
 }
 catch (error) {
     bootError = error instanceof Error ? error.message : 'Browser storage is unavailable.';

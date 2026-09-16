@@ -97,7 +97,12 @@ export default function Plans() {
     return <><PageHeader eyebrow="YOUR MONTHLY PRACTICE" title={monthLabel(month)} description="A useful month starts with a small, balanced commitment."/><Card><Empty title="No plan for this month yet" description="Choose a focus, pick one activity for each scope and set real dates." action={<ActionLink to="/plan/new"><Plus size={16}/>Build a monthly plan</ActionLink>}/></Card></>;
 }
 export function PlanDetail() {
-    const { id } = useParams(), user = useUser()!, dispatch = useAppDispatch(), plan = useAppSelector(s => s.planning.plans[id ?? '']), all = useAppSelector(s => s.planning.occurrences), [close, setClose] = useState(false), [custom, setCustom] = useState(false), [edit, setEdit] = useState<string | null>(null), [recurring, setRecurring] = useState<Commitment | null>(null);
+    const { id } = useParams(), user = useUser()!, dispatch = useAppDispatch(), navigate = useNavigate(), month = useAppSelector(s => s.preferences.month), plans = useAppSelector(selectOwnPlans), plan = useAppSelector(s => s.planning.plans[id ?? '']), all = useAppSelector(s => s.planning.occurrences), [close, setClose] = useState(false), [custom, setCustom] = useState(false), [edit, setEdit] = useState<string | null>(null), [recurring, setRecurring] = useState<Commitment | null>(null);
+    const monthPlan = plans.find(candidate => candidate.month === month);
+    useEffect(() => {
+        if (plan && plan.month !== month)
+            navigate(monthPlan ? `/plan/${monthPlan.id}` : '/plan', { replace: true });
+    }, [month, monthPlan, navigate, plan]);
     if (!plan || plan.ownerId !== user.id || plan.orgId !== user.orgId)
         return <Empty title="Plan not available" description="This view only opens plans owned by the current demo identity." action={<ActionLink to="/home">Return to overview</ActionLink>}/>;
     const occurrences = Object.values(all).filter(o => o.planId === plan.id).sort((a, b) => a.date.localeCompare(b.date)), metrics = planMetrics(plan, occurrences);

@@ -94,6 +94,20 @@ export function safeSummary(orgId: string, orgName: string, month: string, snaps
     return { organizationId: orgId, organizationName: orgName, month, participatingLeaders: new Set(relevant.map(s => s.ownerId)).size, closedPlans: relevant.length, activityCounts, scopeCounts, scheduled: sum('scheduled'), completed: sum('completed'), blocked: sum('blocked'), inProgress: sum('inProgress'), cancelled: sum('cancelled'), eligible: sum('eligible'), coverage: scopes.filter(s => metrics.some(m => m.coverage.includes(s))), fullyCoveredDevelopmentPlans: relevant.filter(s => s.plan.theme === 'develop' && planMetrics(s.plan, s.occurrences).coverage.length === 3).length, version, sharedAt };
 }
 export function wheelTotal(scores: Record<Dimension, number | null>): number | null { const values = dimensions.map(d => scores[d]); return values.every(v => typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 10) ? (values as number[]).reduce((a, b) => a + b, 0) : null; }
+export type WheelClassification = 'Struggling' | 'Surviving' | 'Managing' | 'Improving' | 'Thriving';
+export function wheelClassification(total: number | null): WheelClassification | null {
+    if (total === null)
+        return null;
+    if (total <= 34)
+        return 'Struggling';
+    if (total <= 47)
+        return 'Surviving';
+    if (total <= 59)
+        return 'Managing';
+    if (total <= 71)
+        return 'Improving';
+    return 'Thriving';
+}
 export function wheelErrors(w: Wellbeing): string[] {
     const errors: string[] = [];
     if (wheelTotal(w.scores) === null)

@@ -56,7 +56,7 @@ function ActivityEditor({ activity, onClose }: {
     activity: Activity;
     onClose: () => void;
 }) {
-    const dispatch = useAppDispatch(), resources = useAppSelector(s => s.catalogue.resources), all = useAppSelector(s => s.catalogue.activities);
+    const dispatch = useAppDispatch(), all = useAppSelector(s => s.catalogue.activities);
     const [title, setTitle] = useState(activity.title), [description, setDescription] = useState(activity.description), [steps, setSteps] = useState(activity.steps.join('\n')), [approved, setApproved] = useState(false), [errors, setErrors] = useState<string[]>([]);
     const original = activity.supersedesId ? all[activity.supersedesId] : activity;
     const build = (publish: boolean): Activity | null => {
@@ -68,9 +68,6 @@ function ActivityEditor({ activity, onClose }: {
         const lines = steps.split('\n').map(x => x.trim()).filter(Boolean);
         if (!lines.length || lines.length > 12 || lines.some(x => x.length > 2000))
             problems.push('Add one to twelve practical steps, each no longer than 2,000 characters.');
-        const source = resources[activity.resourceId];
-        if (publish && (!source || source.status !== 'approved' || source.dependency.trim()))
-            problems.push('The source record must have demo approval and no unresolved dependency.');
         if (publish && !approved)
             problems.push('Explicitly acknowledge the publication boundary.');
         setErrors(problems);
