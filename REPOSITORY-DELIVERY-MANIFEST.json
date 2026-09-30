@@ -1,0 +1,483 @@
+{
+  "prepared": "2026-09-30",
+  "source_archive": "Taleed-Talent-main.zip",
+  "source_archive_sha256": "607db468d82951fd28d42e3c5b1563cef82fd84480a2f68e666991e1020f5ad9",
+  "source_archive_bytes": 177351,
+  "original_file_count": 65,
+  "original_application_source_files_preserved": 29,
+  "application_source_changed": false,
+  "backend_implemented": false,
+  "production_deployed": false,
+  "production_url": null,
+  "executed_checks": {
+    "standalone_source_check": {
+      "passed": true,
+      "typescript_files_checked": 27,
+      "scope": "Syntax/static relative imports; no full semantic typecheck."
+    },
+    "standalone_domain_check": {
+      "passed": 41,
+      "failed": 0,
+      "scope": "Pure functions/synthetic seed; no React/Redux/Zod/browser/backend integration."
+    }
+  },
+  "not_run": [
+    "npm ci",
+    "full frontend typecheck",
+    "Vitest",
+    "frontend build",
+    "Playwright",
+    "Docker",
+    "Laravel/MySQL integration",
+    "GCP deployment",
+    "backup/restore rehearsal"
+  ],
+  "kind": "Uploaded repository plus production prompts; application source unchanged",
+  "modified_original_files": [
+    "taleed-talent-spa/AGENTS.md",
+    "taleed-talent-spa/CODEX_MASTER_PROMPT.md",
+    "taleed-talent-spa/README.md"
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/deploy-pages.yml",
+      "bytes": 1240,
+      "sha256": "398568610e3f2d260e7d44d289ca39801a67a51185dd1cab4e60312f3dae27f3"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 3789,
+      "sha256": "190b6e7286e37b46247d96ad8d59bb3e787c312f3117b79887032c4f7226dfb4"
+    },
+    {
+      "path": "CLAUDE.md",
+      "bytes": 870,
+      "sha256": "fef963ace456fd28f61fa11b292a55e2e9523f00fafea51b335862f9fe6f8037"
+    },
+    {
+      "path": "DELIVERY-NOTES.md",
+      "bytes": 1830,
+      "sha256": "c7398d2a6092ea4e2407ad0bae8833d076bd5d2a15c06a9d68d3de41087f53b7"
+    },
+    {
+      "path": "START-HERE-PRODUCTION.md",
+      "bytes": 6773,
+      "sha256": "32caef8f016333c365bcbf23f99906c727939609f956d1e46b7f7d653e7aafe7"
+    },
+    {
+      "path": "docs/production/ACCEPTANCE.md",
+      "bytes": 10041,
+      "sha256": "1bd473b738019802c47cc4dd9a014185e5a784f2a8f71d6bba29f6e3a542aa16"
+    },
+    {
+      "path": "docs/production/API-CONTRACT.md",
+      "bytes": 10674,
+      "sha256": "750cb658f1ad1a3e2715a1e24b989158397a828a28817e42cc14c148003daff2"
+    },
+    {
+      "path": "docs/production/ARCHITECTURE.md",
+      "bytes": 9446,
+      "sha256": "0cd52f4e118b93bd5c235c13b00dc7a51355898892fbed5f29837e01ca656e45"
+    },
+    {
+      "path": "docs/production/DATABASE-SCHEMA.md",
+      "bytes": 19491,
+      "sha256": "61b5786c1f6e0479c2c83297efcee68b3702063c163dd06e60e18e54ea89d940"
+    },
+    {
+      "path": "docs/production/DECISIONS-AND-BLOCKERS.md",
+      "bytes": 5038,
+      "sha256": "a760265619bdbe43ff6450eafd8567d64a8975b4a96d9fccef1a2564386982a6"
+    },
+    {
+      "path": "docs/production/MASTER-PROMPT.md",
+      "bytes": 25988,
+      "sha256": "085a9b03d5e4f50b50f8b2b873bde674830bfca80fc138a239a75586c8d77247"
+    },
+    {
+      "path": "docs/production/OPERATIONS.md",
+      "bytes": 18342,
+      "sha256": "c778e280c2c6eed43d40dfe2c72003a629ac8964bb813d0675b129de1c6b0318"
+    },
+    {
+      "path": "docs/production/PARALLEL-AGENTS.md",
+      "bytes": 5398,
+      "sha256": "347108035f58bdf2544c4fd100e2a4a2e19d81e7799e01c954e13d006d3221e9"
+    },
+    {
+      "path": "docs/production/PHASE-PROMPTS.md",
+      "bytes": 12800,
+      "sha256": "c037bac5d29d01990df0f83cf9f4c6f5380aebddb5c5829204468ead91240682"
+    },
+    {
+      "path": "docs/production/REPOSITORY-AUDIT.md",
+      "bytes": 9610,
+      "sha256": "2b679c59fc0fd8d488a6d83a233b069729733db9b2cc645e714343b75a54c028"
+    },
+    {
+      "path": "docs/production/SOURCES.md",
+      "bytes": 5299,
+      "sha256": "7847e1bb8805d08778b0e544f6f1a24f0882067fcb238987512e6891e6131505"
+    },
+    {
+      "path": "docs/production/STATUS.md",
+      "bytes": 994,
+      "sha256": "53117351afda7cdeb330577cb5b8b0d639c899b375c42353c16e216ad7272fd9"
+    },
+    {
+      "path": "docs/production/archive/AGENTS.prototype.md",
+      "bytes": 1974,
+      "sha256": "1e7b8775a7e41aea101201dffd510f3f190dae6d4c9aa33e0fd1616d0bd0aca1"
+    },
+    {
+      "path": "docs/production/archive/CODEX_MASTER_PROMPT.prototype.md",
+      "bytes": 24603,
+      "sha256": "fe96468a14d2158d176c983bcdfeeb1dad821c2d20b5be28439bd34a497a794a"
+    },
+    {
+      "path": "docs/production/archive/PACKAGE_MANIFEST.prototype.json",
+      "bytes": 9979,
+      "sha256": "f12cb5149214d7fddaf7af410d67c5e743a105823658c39cb4d2cc16d85c659e"
+    },
+    {
+      "path": "docs/production/archive/README.prototype.md",
+      "bytes": 13670,
+      "sha256": "10f060427f3808e1dce70fe5f4f6b6576062019e2496cb74a7296115e5f5cff3"
+    },
+    {
+      "path": "docs/production/evidence/domain-test-results.json",
+      "bytes": 4240,
+      "sha256": "4d0162bdb689c89241fa20c1ef8fbcbeb4b47d44e2d3bf29de191687b799186c"
+    },
+    {
+      "path": "docs/production/evidence/source-check-results.json",
+      "bytes": 236,
+      "sha256": "10519dacb01b5948a7a950f729b8cc1a554aea5c9d53d8baf2ae9803a80b4c43"
+    },
+    {
+      "path": "docs/production/handoffs/TEMPLATE.md",
+      "bytes": 995,
+      "sha256": "edbe262ac4e6f832789e0626efebcdea054f3cf9cd4f5dc48d52e5bc9c501ffd"
+    },
+    {
+      "path": "taleed-talent-spa/.github/workflows/check.yml",
+      "bytes": 811,
+      "sha256": "bd964e83360c979b5a7530269c1f4a4035f80bd4f6d51922e1f661f53143d56f"
+    },
+    {
+      "path": "taleed-talent-spa/.gitignore",
+      "bytes": 172,
+      "sha256": "f78912ac669757866b4deceb5400fb51e69b1840fbc2ed52d1d208b55eca5e03"
+    },
+    {
+      "path": "taleed-talent-spa/.nvmrc",
+      "bytes": 3,
+      "sha256": "68ca3fba3b7e864770cb61aeb306d4bd4354b68ab4dd38450860c5d823e42a53"
+    },
+    {
+      "path": "taleed-talent-spa/.prettierignore",
+      "bytes": 67,
+      "sha256": "3441efba5882daefc4b0649b1c11472b5a3662a6412f8e2136a0724283b6f495"
+    },
+    {
+      "path": "taleed-talent-spa/.prettierrc.json",
+      "bytes": 106,
+      "sha256": "f05f85b3710b0912d48945e21bbac3928685ecc5ac9466332eeb57e25d4d2568"
+    },
+    {
+      "path": "taleed-talent-spa/AGENTS.md",
+      "bytes": 1989,
+      "sha256": "916d3042095c93521da17c91a5f84fe203075115dd88bcd3d6451fbd8e1b372e"
+    },
+    {
+      "path": "taleed-talent-spa/CODEX_MASTER_PROMPT.md",
+      "bytes": 25026,
+      "sha256": "00dd2f9bf97bda85496d8f38c17782e36c616c160e91bb30bfbc02ead13c2710"
+    },
+    {
+      "path": "taleed-talent-spa/PACKAGE_MANIFEST.json",
+      "bytes": 9979,
+      "sha256": "f12cb5149214d7fddaf7af410d67c5e743a105823658c39cb4d2cc16d85c659e"
+    },
+    {
+      "path": "taleed-talent-spa/README.md",
+      "bytes": 14093,
+      "sha256": "a1a0422de6f3a892dcd252a1696fcc634f4551941667d785236ea3ee4443ca65"
+    },
+    {
+      "path": "taleed-talent-spa/docs/ACCEPTANCE_CHECKLIST.md",
+      "bytes": 4496,
+      "sha256": "f0e3e9487a07b5014ece80506e6fcfa7e68cc5f5570171cec898dd7a3b3ae53b"
+    },
+    {
+      "path": "taleed-talent-spa/docs/ARCHITECTURE.md",
+      "bytes": 9844,
+      "sha256": "a0bc2d7e2bb7b80effed37bdb2589638784c57f3908240344ec028d045348421"
+    },
+    {
+      "path": "taleed-talent-spa/docs/DEMO_WALKTHROUGH.md",
+      "bytes": 6945,
+      "sha256": "f6ede51569a37252176a45904a5b1fc8dfe5ce3b5570c2b95818417f3ab33033"
+    },
+    {
+      "path": "taleed-talent-spa/docs/DESIGN_AND_CONTENT.md",
+      "bytes": 4374,
+      "sha256": "e6e5ea6c787bed2105388b440503fdd38ecbdb6d19a7effdeffa9be706bd1f75"
+    },
+    {
+      "path": "taleed-talent-spa/docs/SCREEN_COVERAGE.md",
+      "bytes": 5657,
+      "sha256": "9657c096820cd3794a887ccafda21818d44e6e5d0bd40927bf999ad76da9f0dc"
+    },
+    {
+      "path": "taleed-talent-spa/docs/SOURCES.md",
+      "bytes": 2824,
+      "sha256": "3be654987124b8322fd4a8743053f94afedb411579a0d4c70a836419d9796005"
+    },
+    {
+      "path": "taleed-talent-spa/docs/VERIFICATION.md",
+      "bytes": 3188,
+      "sha256": "5d8d5ade0f13e410fda4d4162dfbe3804fabd39b377ebeda6bd78f5be4fc5c97"
+    },
+    {
+      "path": "taleed-talent-spa/docs/domain-test-results.json",
+      "bytes": 4240,
+      "sha256": "6fd2a2aee2fc609e7cdf7f84fb4c29a17edfb43a33dd5d474f97322ab27aa8ec"
+    },
+    {
+      "path": "taleed-talent-spa/docs/source-check-results.json",
+      "bytes": 236,
+      "sha256": "cdfd0f0ce59677f2707e26059bd3995132bb9a5211847b17c09044e8b4d594af"
+    },
+    {
+      "path": "taleed-talent-spa/e2e/journeys.spec.ts",
+      "bytes": 3340,
+      "sha256": "eb7fa0c9d17e96b9b3562c214ea866285a222928f9e2815dc56407041c68eaff"
+    },
+    {
+      "path": "taleed-talent-spa/index.html",
+      "bytes": 490,
+      "sha256": "1231dd72449a1d2037392105332cad976240a8908f6e90fc97baea8af8524103"
+    },
+    {
+      "path": "taleed-talent-spa/package-lock.json",
+      "bytes": 96090,
+      "sha256": "44242a378ee800beae4e43af2af735c027ea0bd153c138d2b1ddaaa8c49f6f36"
+    },
+    {
+      "path": "taleed-talent-spa/package.json",
+      "bytes": 1601,
+      "sha256": "996f2eeac79138620d0147ed4d160202e9419a2220c0e549a11c68bbf87661e7"
+    },
+    {
+      "path": "taleed-talent-spa/playwright.config.ts",
+      "bytes": 581,
+      "sha256": "ba9b469dcee0556638d212846e42c3606b3e80ca49a1629507ab330eae5bbcbe"
+    },
+    {
+      "path": "taleed-talent-spa/sample-activity-draft.json",
+      "bytes": 1290,
+      "sha256": "7fc7d2e71dfc0520045ce42576ad5c5732dd3ec147fd1ce8eb7cfde8f2470f35"
+    },
+    {
+      "path": "taleed-talent-spa/scripts/bootstrap.mjs",
+      "bytes": 2628,
+      "sha256": "0b725af96b2ece0ba84019d2d7dbeb78a94c716050e63b93b139c3c2d0c802db"
+    },
+    {
+      "path": "taleed-talent-spa/scripts/check-source.mjs",
+      "bytes": 2104,
+      "sha256": "910f41b83e2eee9a8281fd64c575249f8aa1d2f05f888c29fcac471c4318e487"
+    },
+    {
+      "path": "taleed-talent-spa/scripts/record-versions.mjs",
+      "bytes": 986,
+      "sha256": "ac93556274d05459491040e13475231774b20bd56774aeaa0f00310e05e1c9b4"
+    },
+    {
+      "path": "taleed-talent-spa/scripts/test-domain.mjs",
+      "bytes": 9566,
+      "sha256": "d51635ce4730100c12da3fbe3ef132c6dafdd59b5756c12acebc8bd52a88a130"
+    },
+    {
+      "path": "taleed-talent-spa/scripts/typescript-runtime.mjs",
+      "bytes": 569,
+      "sha256": "09a4f41dda6577709afe41a5aa3cc8578f29d7d3fc0ea24e77ff38f478ab7efe"
+    },
+    {
+      "path": "taleed-talent-spa/src/app/App.tsx",
+      "bytes": 5864,
+      "sha256": "ac27d4f8a95ab9bd2a4027f3c77fd6cc926ddacba0b902716627a42bbe0d50a9"
+    },
+    {
+      "path": "taleed-talent-spa/src/app/hooks.ts",
+      "bytes": 375,
+      "sha256": "167362d3933d309f1fb92fd5041ebd66f785452fbec5d2ab15bb11f6b9bb9b0f"
+    },
+    {
+      "path": "taleed-talent-spa/src/app/selectors.ts",
+      "bytes": 1927,
+      "sha256": "099022ef67f5d3bdf62ca508662bbec39e5e21b1c7b9d11eb2a0d3213221db98"
+    },
+    {
+      "path": "taleed-talent-spa/src/app/slices.ts",
+      "bytes": 10379,
+      "sha256": "3183b179763b9f8669dca0509d17a6cd40bb8ce550d09e314cff09dba29e3126"
+    },
+    {
+      "path": "taleed-talent-spa/src/app/store.ts",
+      "bytes": 5634,
+      "sha256": "1f350f867b29a863cd6c112ea23f4de1c03e3c9bfcd952ee24597ca7ce7a6c51"
+    },
+    {
+      "path": "taleed-talent-spa/src/components/Shell.tsx",
+      "bytes": 8052,
+      "sha256": "91e211bf159659a6b31720294249512a4b9e817c56409157ae8fe18666ed1033"
+    },
+    {
+      "path": "taleed-talent-spa/src/components/UI.tsx",
+      "bytes": 6581,
+      "sha256": "b8a777e3f8ddc03e2175811ab7d2f5e3bb7a0e27de10b288350709f5b6a652a3"
+    },
+    {
+      "path": "taleed-talent-spa/src/data/catalogue.ts",
+      "bytes": 7541,
+      "sha256": "b5198059657ec3f9631580acede51f45483f81a192a93b0a7d81efb2ae3b82a9"
+    },
+    {
+      "path": "taleed-talent-spa/src/data/seed.ts",
+      "bytes": 4238,
+      "sha256": "0bd57b530295855cbe8f537ea6f16d02ffd009d8e5a8094c0564425b1f310705"
+    },
+    {
+      "path": "taleed-talent-spa/src/domain/logic.ts",
+      "bytes": 10646,
+      "sha256": "08dec25c42049515cef31f5e96d60160c8b44b6747158bf0579a26a479a3124a"
+    },
+    {
+      "path": "taleed-talent-spa/src/domain/types.ts",
+      "bytes": 5304,
+      "sha256": "3e9cdcbb6c0f72da95c168cccf9843030b533418ee847ef8ab693c8ff5405075"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/admin/Admin.tsx",
+      "bytes": 12233,
+      "sha256": "d21a6117359dc73175e368c87650229f2c720a08fa03047284475b6ea442c77b"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/calendar/Calendar.tsx",
+      "bytes": 9466,
+      "sha256": "c784d202532b4b5fe9f39297c3c3f0a820e49ae1fc30286caf50273eab454b3d"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/home/Home.tsx",
+      "bytes": 6473,
+      "sha256": "77968ee8fe45f1d6eb9e6d677051ae0fadcf4640458287547f438c6401a444c7"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/library/Library.tsx",
+      "bytes": 8886,
+      "sha256": "a296faad8e87edfe5d1b1d3f98ae48905562e05fd6f20fce6078cec03d533508"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/onboarding/Onboarding.tsx",
+      "bytes": 10496,
+      "sha256": "f871c88227e3d6ab5251be229e8eb17210cc88169d1ae839e04c56c9aada3be3"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/organisation/Organization.tsx",
+      "bytes": 16504,
+      "sha256": "9bc3cd51901bd879215bc85e7d50b6bedf5dd9faeec6965da1b8877fa26178d4"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/planning/Planning.tsx",
+      "bytes": 24072,
+      "sha256": "e183cf775dcb1a4091954f0287dc4c4b6c11a48d28f8e8f95783976694795499"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/reflection/Conversations.tsx",
+      "bytes": 6697,
+      "sha256": "b0295f158ea366af36e03dd2f2a5410352afd2a1a058c0f3a6a68ca1c8289824"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/reflection/History.tsx",
+      "bytes": 2774,
+      "sha256": "8c6dab74d475ab547692bbbb8a9dd6d57bf92f5740195128b82b1b5c68ab0d74"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/reflection/Reports.tsx",
+      "bytes": 11553,
+      "sha256": "d63ce174ee19b0c93c991266a1b361bf081d8c9d6a9ab6fdc8d7567d346c4bed"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/reflection/Wellbeing.tsx",
+      "bytes": 15433,
+      "sha256": "0799935dbf69a501f03cdc1ee8428bd5be118d5136beb7526587d5ab4657dd5a"
+    },
+    {
+      "path": "taleed-talent-spa/src/features/settings/Settings.tsx",
+      "bytes": 15013,
+      "sha256": "8003698a3168ce515b10946e8db7277d66bb0e8d0b00c2fbdf064a70ef3c3a77"
+    },
+    {
+      "path": "taleed-talent-spa/src/main.tsx",
+      "bytes": 466,
+      "sha256": "167450ca63f729fae8eda89fb2e5714dc808d654f9a3e359847d584f3890b1b4"
+    },
+    {
+      "path": "taleed-talent-spa/src/services/download.ts",
+      "bytes": 389,
+      "sha256": "c732380e9cc49417c2ba6ce80c199af4d76f1fbae69fd1a81ce109a39230cf29"
+    },
+    {
+      "path": "taleed-talent-spa/src/services/repository.ts",
+      "bytes": 3349,
+      "sha256": "c60ca030bce0fec8af680a42cd9159038cd265e08cfcc3481c53041a2e3fe9ad"
+    },
+    {
+      "path": "taleed-talent-spa/src/services/schema.ts",
+      "bytes": 7827,
+      "sha256": "3f11376770e688bc8608a5c46ec58782efff1169155c1e69ee7878d91caa028b"
+    },
+    {
+      "path": "taleed-talent-spa/src/styles/app.css",
+      "bytes": 42278,
+      "sha256": "5c9743055c71e7bb32d965a526a345c74c33d55203309e8e82d22ed7463f5b26"
+    },
+    {
+      "path": "taleed-talent-spa/src/styles/tokens.css",
+      "bytes": 931,
+      "sha256": "6afb8d3799ea529d0916525a63f8de5b0a24de08dc0e322ca106715ebb465c74"
+    },
+    {
+      "path": "taleed-talent-spa/tests/domain.test.ts",
+      "bytes": 2120,
+      "sha256": "8a110b80df9f3d6f4b1f5805def4da3ac30962208b6a82bb2639f0229d6d157f"
+    },
+    {
+      "path": "taleed-talent-spa/tests/reducers.test.ts",
+      "bytes": 2807,
+      "sha256": "738aa379130f7eda74626233cb69896ff161313f3ba8053ec0a86522b0b06230"
+    },
+    {
+      "path": "taleed-talent-spa/tests/repository.test.ts",
+      "bytes": 3002,
+      "sha256": "653317b494ea7ff1dcb1bb89aa315ff2f3ca018406fdd375169475cf58fd7084"
+    },
+    {
+      "path": "taleed-talent-spa/tests/setup.ts",
+      "bytes": 155,
+      "sha256": "a2a82b3a97071aab6b663d26bb815623f65e58fe867144de61b09d41e3d442d2"
+    },
+    {
+      "path": "taleed-talent-spa/tsconfig.json",
+      "bytes": 464,
+      "sha256": "e3613cd06721a91d69182af927084a38e228b9a5ac9e04c8fa70f61d38675cbe"
+    },
+    {
+      "path": "taleed-talent-spa/vite.config.ts",
+      "bytes": 354,
+      "sha256": "ba45a19561935ae068a775cc4a624c870e4400961e4e790131aaa2722eb7dffe"
+    }
+  ]
+}
