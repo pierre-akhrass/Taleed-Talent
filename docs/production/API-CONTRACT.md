@@ -18,15 +18,14 @@ Tenant/owner context is selected from authenticated authorized membership. An or
 
 ## Capability matrix
 
-| Capability | Leader / own Champion workspace | Champion / organization role | Assigned Taleed analyst | Content administrator | Statamic CMS administrator |
+| Capability | Leader | Taleed | Application Admin | Statamic CMS administrator |
 |---|---|---|---|---|---|
-| Own plans/drafts/calendar/closures | Own records | Own records only | No implied access | No implied access | No implied access |
-| Own conversation/wheel/private reports | Own records after feature/privacy gate | Own records only, never another leader's | No | No | No |
-| Approved catalogue/library | Authorized application access | Authorized application access | As explicitly needed | Manage SQL reference versions | CMS guidance only |
-| Organization membership/invitations | Limited own membership view | Within own organization | No | No unless separately granted | No |
-| Preview/confirm/withdraw aggregate share | No | Own organization, explicit action | No | No | No |
-| Shared portfolio / safe export | As product permits own org published view | Own org | Effective shares of assigned organizations | No blanket privilege | No |
-| CMS guidance editing | No | No | No | No automatic CP access | Single authorized CP account |
+| Own plans/drafts/calendar/closures | Own records | No implied access | No implied access | No implied access |
+| Own conversation/wheel/private reports | Own records after feature/privacy gate | No | No | No |
+| Approved catalogue/library | Authorized application access | As assigned | Manage SQL reference versions | CMS guidance only |
+| Organization membership/invitations | Own membership view | No | Create organizations and invite Leaders | No |
+| Monthly organization reports | No approval or send action; close produces the report | Read safe reports for assigned organizations | No private report bypass | CMS guidance only |
+| CMS guidance editing | No | No automatic CP access | No automatic CP access | Single authorized CP account |
 
 Separate grants may coexist for the same person; possessing a platform role never removes record-owner privacy restrictions. Infrastructure operation is a separate, controlled trust boundary, not an “impersonate everyone” business role.
 
@@ -35,8 +34,8 @@ Separate grants may coexist for the same person; possessing a platform role neve
 | Area | Routes / commands | Essential enforcement |
 |---|---|---|
 | Session/profile | `GET /me`, `PATCH /me/preferences`, approved account/password operations | No all-users envelope; invalidate auth/cache state after security changes. |
-| Workspace | `POST /organizations`, `GET /organizations/current`, `PATCH /organizations/current` | Creation does not join an existing name/domain; updates Champion-only and versioned. |
-| Membership | `GET /organizations/current/members`, `POST /organizations/current/invitations`, `POST /invitations/{id}/accept`, `POST /invitations/{id}/revoke` | Return only necessary organization member details; token not logged; correct verified account and atomic consumption. |
+| Workspace | `POST /admin/organizations`, `GET /organizations/current`, `PATCH /organizations/current` | Admin creates the organization; no public self-registration or name/domain auto-join. |
+| Membership | `GET /organizations/current/members`, `POST /admin/organizations/{id}/invitations`, `POST /invitations/{id}/accept`, `POST /invitations/{id}/revoke` | Admin-created invitations target `leader` only; return only necessary member details; token not logged; correct verified account and atomic consumption. |
 | Catalogue | `GET /activities`, `GET /activities/{id}`, `GET /source-documents`, protected source download, bookmark commands | Published global plus authorized own custom content; retired source availability policy; no private storage URLs. |
 | Custom Develop | `POST /custom-activities`, versioned own edit/retire commands | Develop only, owner+tenant bound, clear authorship, no global publication. |
 | Drafts | `GET/POST /plan-drafts`, `GET/PATCH /plan-drafts/{id}`, `POST /plan-drafts/{id}/activate` | Partial save vs complete activation validation; expected version; Pick-3 authoritative server check. |
@@ -47,8 +46,7 @@ Separate grants may coexist for the same person; possessing a platform role neve
 | Personal conversations | `GET/POST /conversations`, `GET/PATCH/DELETE /conversations/{id}`, `POST /conversations/{id}/complete` | Owner-only including list/count; feature/privacy gate, verified guide version, deletion/retention behavior. |
 | Personal wheel | `GET/POST /wellbeing`, `GET/PATCH/DELETE /wellbeing/{id}`, complete/revision commands | Owner-only, nine nullable integer ratings, rules version, explicit privacy gate, no classification until approved. |
 | Reports | `POST /private-exports`, `GET /private-exports/{id}`, protected expiring download; plan `.ics` export | Recheck ownership at enqueue/run/download; CSV/HTML/ICS/PDF safety; private no-store responses. |
-| Sharing | `POST /organization-shares/preview`, `POST /organization-shares/{candidate}/confirm`, `POST /organization-shares/{id}/withdraw` | Exact frozen payload hash and source fingerprint; Champion permission; one effective version per org/month. |
-| Analyst portfolio | `GET /portfolio`, `GET /portfolio/organizations/{id}/shares`, safe export request | Assigned organizations + effective shares only; filters match screen/export; no private joins. |
+| Monthly reports | Created by the close transaction/outbox after `POST /plans/{id}/close`; `GET /portfolio`, `GET /portfolio/organizations/{id}/reports`, safe export request | Freeze the allowlisted payload from the closed revision; one effective version per organization/month; no user approval, arbitrary browser summary or private joins. |
 | SQL content administration | draft source/activity import, review, approve, publish, retire routes under `/content-admin/*` | Content-admin policy; immutable version creation; source rights/dependencies and actual hash; no CP privilege. |
 | Privacy | owner export/deletion requests, notice acceptance/withdrawal | No silent erasure/cascade ambiguity; approved retention and backup recovery suppression. |
 
@@ -82,7 +80,7 @@ The prototype already uses the following organization-level shape. Preserve name
 
 The values above illustrate a shape, not a seeded production result. `coverage` contains only supported scope strings. Build a new response explicitly from eligible closed-plan facts. Never spread full models/snapshots into this object. Organization identity is allowed; individual names, emails, IDs, aliases, employee data, titles, instructions, custom narratives, notes/reflections, conversation use/metadata and all well-being content/participation are prohibited.
 
-A preview candidate freezes proposed values and their source revision fingerprint. Confirmation returns the same approved business payload, with final server version/time, not a silently recalculated different set of counts. If relevant closures, organization display identity, share policy or source fingerprint changed, expire/conflict the candidate and require a new preview. Do not accept an arbitrary JSON summary composed by the browser.
+The close transaction/outbox freezes the allowlisted payload and its source revision fingerprint. Taleed reads return that exact server-generated payload, not a silently recalculated or browser-composed set of counts. If a correction closes a newer revision, create a new effective report version and retain the immutable prior report.
 
 A withdrawal blocks subsequent in-app reads and new downloads of that effective share. It cannot recall previously downloaded copies. Permission revocation, new analyst assignments and supersession must invalidate server/client caches. Keep internal traceability references separate from the external payload. Agree small-cohort suppression/disclosure rules explicitly; do not invent a threshold or expose private participation under a “support” route.
 

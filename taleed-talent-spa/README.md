@@ -82,10 +82,8 @@ All identities and organizations are fictional. There is no real login or passwo
 |---|---|---|
 | Amina Hassan | Team Leader · Cedar Works | Default: active September 2026 plan and a closed August fixture. |
 | Omar Nasser | Team Leader · Cedar Works | Empty workspace and another leader’s personal-record boundaries. |
-| Noor Saleh | SME Champion · Cedar Works | Invitations, organization setup and explicit aggregate sharing. |
 | Rana Ali | Team Leader · Dune Studio | Separate fictional organization; no Cedar plans. |
-| Mariam Ahmed | Taleed Analyst | Assigned to Cedar Works only; sees shared summaries, not private data. |
-| Hassan Abdullah | Content Administrator | Source inventory and demo-only recovery console. |
+| Hassan Abdullah | Admin · Cedar Works | Leader invitations, automatic monthly reports and source inventory. |
 
 Use the **Demo persona** selector under the header. Role switching is a presentation aid, not authentication. Signing out only exits the demo view; it does not delete the browser’s records.
 

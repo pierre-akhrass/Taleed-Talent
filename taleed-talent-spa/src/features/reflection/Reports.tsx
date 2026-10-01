@@ -107,7 +107,7 @@ export function ReportDetail() {
           ? s.privateData.wellbeing[id ?? '']
           : undefined,
   );
-  if (!record || record.ownerId !== user.id || !['leader', 'champion'].includes(user.role))
+  if (!record || record.ownerId !== user.id || user.role !== 'leader')
     return (
       <Empty
         title="Personal report unavailable"

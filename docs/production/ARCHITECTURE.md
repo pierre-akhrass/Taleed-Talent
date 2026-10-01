@@ -69,7 +69,7 @@ Server services own recurrence, metrics, close/reopen, source publication, invit
 
 One source document version points to real immutable bytes/hash and rights approval. One activity version points to its verified source/adaptation record. Commitments pin immutable approved versions, or tenant-owned validated custom Develop content. Retiring a source or activity stops new use according to the approved policy; it does not silently rewrite history. Historical display after rights withdrawal needs a deliberate policy, not accidental exposure through public assets.
 
-Application-encrypted private payloads are owner-private at the application permission layer. This is not end-to-end encryption against infrastructure administrators with keys. Record the operational access policy and keep private contents out of logging, telemetry, queues and generic audit diffs. Content administrators and analysts have no private-data bypass.
+Application-encrypted private payloads are owner-private at the application permission layer. This is not end-to-end encryption against infrastructure administrators with keys. Record the operational access policy and keep private contents out of logging, telemetry, queues and generic audit diffs. The Admin has no private-data bypass.
 
 Feature switches should distinguish `private_conversations_enabled`, `private_wellbeing_enabled`, `wellbeing_classification_enabled` and `organization_sharing_enabled`, or equivalent. Default unresolved sensitive features off for real data, with clear UI explanation and matching server denial. A frontend-only disabled button is insufficient. No automatic enablement merely because seeded local tests pass.
 

@@ -29,10 +29,9 @@ export function makeSeed(month = DEMO_MONTH): PersistedData {
             users: {
                 'leader-a': { id: 'leader-a', name: 'Amina Hassan', email: 'amina@example.test', orgId: 'cedar', role: 'leader' },
                 'leader-b': { id: 'leader-b', name: 'Omar Nasser', email: 'omar@example.test', orgId: 'cedar', role: 'leader' },
-                'champion-a': { id: 'champion-a', name: 'Noor Saleh', email: 'noor@example.test', orgId: 'cedar', role: 'champion' },
                 'leader-d': { id: 'leader-d', name: 'Rana Ali', email: 'rana@example.test', orgId: 'dune', role: 'leader' },
                 analyst: { id: 'analyst', name: 'Mariam Ahmed', email: 'mariam@example.test', orgId: 'taleed', role: 'taleed' },
-                admin: { id: 'admin', name: 'Hassan Abdullah', email: 'hassan@example.test', orgId: 'taleed', role: 'admin' },
+                admin: { id: 'admin', name: 'Hassan Abdullah', email: 'hassan@example.test', orgId: 'cedar', role: 'admin' },
             }, invitations: {}, summaries: {}
         },
         catalogue: { activities: structuredClone(activitySeed), resources: structuredClone(resourceSeed), bookmarks: {} },

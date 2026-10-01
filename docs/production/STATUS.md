@@ -39,10 +39,10 @@ Private conversations and the well-being wheel ship **built but switched off** (
 | D5 | Catalogue content | **Verbatim source text** from the seven hash-verified PDFs, imported as drafts; **client content owner approves**; content admin publishes | Remove the 66 generated descriptions from any production path. Source of the import: `Taleed_Talent_Tool_Package/reference/talent_catalogue.v1.draft.json` and `conversation_guide.v1.draft.json` (authorized copy supplied to the developer, never committed with the PDFs). |
 | D6 | Well-being bands | **Numeric total and profile only at launch**; no labels | Remove the "higher band" rule from production code/UI/reports. `wellbeing_classification_enabled=false`. Tests at totals 35 and 60 prove no label appears anywhere. |
 | D7 | Private features | **Fully built and tested, switched off on the server at launch** until the client privacy owner signs off | Flags `private_conversations_enabled` and `private_wellbeing_enabled` default off; API, jobs and exports deny when off, not just the UI. |
-| D8 | Small-group sharing | **Minimum 3 participating leaders** with closed plans in the month before a Champion can share | Enforce in preview and confirm on the server; show a clear message in the UI. Record as sharing policy version 1. |
-| D9 | Onboarding | **Invitation-only at launch.** A Taleed admin creates the organization and invites the Champion; the Champion invites leaders | No public organization self-registration route in production. Invitation acceptance still includes email verification and password setup. |
+| D8 | Monthly reporting | **A safe organization report is shared automatically with Taleed when a leader closes a monthly plan.** There is no Champion approval, preview or send step. | Generate the frozen allowlisted summary transactionally from the closed revision and make it available to assigned Taleed users; never include private records or participation signals. |
+| D9 | Onboarding | **Invitation-only at launch.** The application Admin creates the organization and invites Leaders; there is no Champion role or Champion panel | Invitation acceptance still includes email verification and password setup. Membership target role is always `leader`; the separate Statamic Core account remains a CMS operator, not an application member. |
 | D10 | Plans per month | **One active plan per leader per month** | Add unique `(organization_id, owner_user_id, month)` on `plans`. This overrides the "do not add unique owner/month" line in `DATABASE-SCHEMA.md`. Corrections use reopen/re-close revisions. |
-| D11 | Two-factor sign-in | **Required** for Taleed analyst, content admin and the Statamic CMS admin; **optional** for Champions and leaders | TOTP + recovery codes via Laravel Fortify (app guard) and Statamic Core's built-in 2FA (CP). Test recovery. |
+| D11 | Two-factor sign-in | **Required** for the application Admin and the Statamic CMS admin; **optional** for Leaders | TOTP + recovery codes via Laravel Fortify (app guard) and Statamic Core's built-in 2FA (CP). Test recovery. |
 | D12 | Language | **English only at launch**, RTL-ready layout | No Arabic content claims. Keep the RTL preview as a layout check only. |
 | D13 | Repository and Pages | **Company-owned private GitHub repository**; Pages becomes **manual-trigger synthetic demo only** | Director transfers/creates the repo (§6). Phase 1 changes `.github/workflows/deploy-pages.yml` to `workflow_dispatch` only with a demo label. |
 | D14 | Team model | **One developer, sequential phases, one AI agent** | One owner of schema, contract, lockfiles and deployment. `PARALLEL-AGENTS.md` is not used unless the director changes this. |
@@ -57,6 +57,10 @@ Private conversations and the well-being wheel ship **built but switched off** (
 | G2 | Client privacy owner approval of notices, retention and access for private features (D7) | Director → client | Switching the private features on (after launch) |
 | G3 | Client confirmation of the 3-leader sharing minimum and summary field list (D8) | Director → client | Switching organization sharing on |
 | G4 | Sender domain for email (D15): an email domain is still needed even though the app uses an IP address | Director | Phase 7 email |
+
+### D17 — application roles and automatic reporting (1 October 2026)
+
+The application has three product roles: **Leader**, **Taleed**, and **Admin**. Leaders own their plans and private records. The Admin creates organizations and invites Leaders. Taleed reads the safe monthly reports produced automatically when plans close. Remove the Champion workspace, explicit Champion sharing consent, Champion invitation controls and Champion-only routes. Keep the single Statamic Core administrator as a separate CMS identity.
 
 ---
 
@@ -101,7 +105,7 @@ Verified on 30 September 2026 against the working tree at commit `5e33846`. Noth
 - **One HTTPS origin:** `/app/*` React (browser routing, old `#/` links redirected), `/api/v1/*` Laravel JSON API, `/auth/*` + `/sanctum/csrf-cookie`, `/help/*` Statamic guidance pages, `/cp` single CMS admin, `/up` and `/ready` health.
 - **Authentication:** application users in MySQL on the `app` guard (Fortify + Sanctum cookies + CSRF); the single CMS admin on Statamic's own guard. A CMS login never grants API access; an app user never becomes a CMS user. No Statamic Pro features.
 - **Data ownership:** MySQL holds all business data; Statamic flat files hold only help/guidance pages and the CMS user; a protected file store holds source PDFs and generated reports. Each is backed up.
-- **Privacy:** owner-private records are encrypted and never visible to Champions, analysts or admins, including counts and "has used" signals. Sharing uses a fixed list of aggregate fields (see `API-CONTRACT.md`) plus the 3-leader minimum.
+- **Privacy:** owner-private records are encrypted and never visible to Taleed or Admin, including counts and "has used" signals. Automatic reports use a fixed list of aggregate fields (see `API-CONTRACT.md`) and the approved small-cohort policy.
 - **Local development:** `https://talent.taleed.test` with a mkcert certificate, Compose project `talent-dev`, MySQL on `127.0.0.1:3308`, Mailpit on 8027/1027, HTTPS port configurable (`TALENT_HTTPS_PORT`, default 443, use 9443 if the Sustainability overlay holds 443). Adding the hosts entry and trusting the certificate need the developer's machine owner's approval.
 - **Production:** dedicated VM, data on a separate persistent disk mounted before Docker starts, external named volumes that must already exist, a dataset identity check, and a separate one-time first-install command that refuses a non-empty target.
 
@@ -143,9 +147,9 @@ The developer starts each phase by pasting the matching message from `docs/produ
 - Source document store with hashes; draft import from the approved extraction (D5); review/approve/publish/retire workflow for the content admin.
 - Statamic guidance pages edited by the single CMS admin.
 - Conversations and well-being wheel, encrypted, owner-only, flags off by default (D6, D7).
-- Sharing: frozen preview, hash-checked confirm, 3-leader minimum (D8), withdraw/supersede, analyst portfolio and safe export.
+- Monthly reports: close-triggered frozen summaries, hash verification, Taleed organization assignment scope, supersede history and safe export.
 - Owner exports, deletion and 30-day erasure (D16); CSV/ICS exports; neutral opt-in reminders through the queue.
-- Done when: negative tests prove no private data or participation signal reaches Champion, analyst, admin, logs, jobs or exports.
+- Done when: negative tests prove no private data or participation signal reaches Taleed/Admin reports, logs, jobs or exports.
 
 **Phase 6 — Production safety (8–11 days)**
 - `compose.prod.data.yaml` and `compose.prod.yaml`, external volumes, mount and dataset-identity guards, systemd ordering.

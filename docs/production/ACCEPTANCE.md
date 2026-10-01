@@ -4,7 +4,7 @@ All implementation/release checks below start as **NOT RUN**. The only checks ex
 
 For each gate record: status (Pass/Fail/Blocked/Not run), test identifier, exact command or manual steps, build/commit, environment, date, result/evidence path and owner. A failed critical privacy, data-integrity, license or recoverability gate blocks release. Lower-impact exceptions require a named owner, deadline and written acceptance. Never relabel an unrun check as pass.
 
-Use at least two synthetic organizations; two leaders and a Champion in the first; a leader and Champion in the second; assigned/unassigned analysts; an application content admin; and the separate single Statamic CP account. Test on the real pinned MySQL implementation, not only in-memory stubs. No live private records in developer/CI fixtures.
+Use at least two synthetic organizations; multiple Leaders and one application Admin; and the separate single Statamic CP account. Test on the real pinned MySQL implementation, not only in-memory stubs. No live private records in developer/CI fixtures.
 
 ## Foundation, identity and licensing
 
@@ -37,11 +37,11 @@ Use at least two synthetic organizations; two leaders and a Champion in the firs
 | ID | Required scenario | Pass condition |
 |---|---|---|
 | P01 | Cross-organization and same-organization wrong-owner requests | Direct API IDs, lists, counts, query filters, exports/jobs/storage URLs deny unauthorized access; no generic admin/CP bypass. |
-| P02 | Personal conversations and wheel | Owner-private payload and metadata; no Champion/analyst participation signal in pages, caches, reports, logs or support tools. |
+| P02 | Personal conversations and wheel | Owner-private payload and metadata; no Admin participation signal or private content in pages, caches, reports, logs or support tools. |
 | P03 | Well-being source boundary | Nine integer 1–10/null draft values; complete total 9–90; classification disabled without explicit versioned approval, including totals 35/60 in every view/report. |
 | P04 | Content/privacy enablement gates | Unapproved source or private collection disabled server-side with honest UI; no inferred permission from general demo approval. |
-| P05 | Exact preview and confirmed sharing | Same frozen payload/source fingerprint; changes require new preview; no arbitrary browser-computed share; concurrent confirmations yield one effective version. |
-| P06 | Aggregate allowlist and analyst assignment | No identity/free-text/private metadata leakage; only effective shares for assigned organizations; matching screen/export filters and approved small-cohort policy. |
+| P05 | Automatic close report | Closing a plan creates the same frozen allowlisted payload Taleed can read; no Champion approval/send step or arbitrary browser-computed share; retries yield one effective version. |
+| P06 | Aggregate allowlist and Taleed scope | No identity/free-text/private metadata leakage; Taleed reads only assigned organizations; screen/export filters match the effective report. |
 | P07 | Withdraw/supersede/revoke access | Effective reads, new exports and downloads denied or updated; old cache invalidated; already downloaded-copy limitation communicated. |
 | P08 | Encrypted data and deletion | Wrong key fails safely; correct protected key restores personal data; erasure removes authorized duplicates/reports; tombstones prevent recovery resurrection. |
 | P09 | Browser persistence/session transitions | No private data/token in localStorage/IndexedDB/persisted Redux/service-worker caches; logout/tenant switch/session expiry clear sensitive memory and in-flight response hazards. |
@@ -69,6 +69,6 @@ Use at least two synthetic organizations; two leaders and a Champion in the firs
 
 ## Minimum end-to-end demonstration
 
-Create and verify an account; create a new organization without joining an existing one; invite and accept a leader; choose a valid three-scope plan; schedule and save it; sign out/in and resume; record completed/blocked/cancelled occurrences; exercise a stale-tab conflict; close an honestly incomplete plan; reopen/reclose without rewriting prior history; preview and explicitly share the safe summary; view it as an assigned analyst; deny an unassigned analyst and another owner's private requests; withdraw the share; update the application release and show preserved data; restore the synthetic recovery set and prove key/file integrity.
+Create and verify an account; have the Admin create an organization and invite a Leader; accept the invitation; choose a valid three-scope plan; schedule and save it; sign out/in and resume; record completed/blocked/cancelled occurrences; exercise a stale-tab conflict; close an honestly incomplete plan; verify the automatically generated safe report as Taleed; deny another owner's private requests; update the application release and show preserved data; restore the synthetic recovery set and prove key/file integrity.
 
 Include owner-private conversation/wheel journeys only when their gates are enabled. Otherwise demonstrate server-side disabled-state enforcement and identify the outstanding approval, rather than accepting real private data prematurely.

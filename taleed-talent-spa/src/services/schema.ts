@@ -49,7 +49,7 @@ export const dataSchema = z.object({
     for (const share of Object.values(data.organization.summaries)) {
         const p = share.payload;
         if (!data.organization.organizations[p.organizationId] || p.eligible !== p.scheduled - p.cancelled || p.completed + p.blocked + p.inProgress > p.eligible || p.fullyCoveredDevelopmentPlans > p.closedPlans)
-            ctx.addIssue({ code: 'custom', message: 'Shared summary counts or organization reference are inconsistent.' });
+            ctx.addIssue({ code: 'custom', message: `Shared summary ${p.organizationId}/${p.month} has inconsistent counts or organization reference.` });
     }
     for (const w of Object.values(data.privateData.wellbeing))
         if (!data.organization.users[w.ownerId])

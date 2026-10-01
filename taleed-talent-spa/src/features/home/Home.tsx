@@ -13,10 +13,10 @@ export function ThemeIcon({ theme }: {
 export function HeroArt() { return <div className="hero-art" aria-hidden="true"><div className="orbit"/><div className="orbit"/><div className="orbit"/><div className="orbit"/><div className="leaf"/><div className="leaf second"/><div className="leaf third"/><div className="spark"/><div className="spark"/></div>; }
 export default function Home() {
     const user = useUser()!, month = useAppSelector(s => s.preferences.month), plans = useAppSelector(selectOwnPlans), occurrences = useAppSelector(s => s.planning.occurrences), draft = useAppSelector(s => s.planning.drafts[`draft:${user.id}`]);
-    if (user.role === 'taleed')
-        return <Navigate to="/portfolio" replace/>;
     if (user.role === 'admin')
         return <Navigate to="/admin" replace/>;
+    if (user.role === 'taleed')
+        return <Navigate to="/portfolio" replace/>;
     const plan = plans.find(p => p.month === month), metric = plan ? planMetrics(plan, Object.values(occurrences)) : null;
     const upcoming = plan ? Object.values(occurrences).filter(o => o.planId === plan.id && !['completed', 'cancelled'].includes(o.status)).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3) : [];
     return <><PageHeader eyebrow="YOUR LEADERSHIP WORKSPACE" title={`Small steps. Stronger teams.`} description={`Welcome back, ${user.name.split(' ')[0]}. Make space for the people and practices that matter.`} action={<ActionLink to="/plan/new"><Plus size={16}/>{draft ? 'Resume draft' : 'Build a plan'}</ActionLink>}/>

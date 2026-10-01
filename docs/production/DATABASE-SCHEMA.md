@@ -18,10 +18,9 @@ Do not cascade-delete an organization or user across every business/audit record
 |---|---|---|
 | `users` | id, normalized_email, display_name, password_hash, email_verified_at, status, authentication_version, timestamps | Unique normalized email under the chosen normalization rule; framework password hashing; no Statamic CP identity here. MFA/recovery material encrypted/hashed using the selected supported implementation. |
 | `organizations` | id, name, sector, city, timezone, status, timestamps | No domain/name auto-join. Naming collisions go through a safe explicit process rather than merging accounts. |
-| `organization_memberships` | id, organization_id, user_id, role (`leader`/`champion`), status, joined_at, revoked_at | Unique `(organization_id,user_id)`; index `(user_id,status)`; Champion may execute own leader capabilities but cannot read others' private records. |
-| `platform_role_assignments` | id, user_id, role (`taleed_analyst`/`content_admin`), assigned_by, assigned_at, revoked_at | Unique active role per user; grant/revoke restricted and audited. Do not map a content admin to a CP superuser. |
-| `analyst_organization_assignments` | id, analyst_user_id, organization_id, assigned_at, revoked_at | Unique `(analyst_user_id,organization_id)`; active scope required for every analyst query/export. |
-| `invitations` | id, organization_id, invited_email, target_role, token_digest, expires_at, accepted_by, accepted_at, revoked_at, created_by | Unique digest; no stored plaintext token; consume under row lock only for correct verified account; replay/expiry/revocation rejected. Unique live email invitations may use a protected invitation-slot row or transactional locking, not a nonexistent MySQL partial index. |
+| `organization_memberships` | id, organization_id, user_id, role (`leader`), status, joined_at, revoked_at | Unique `(organization_id,user_id)`; index `(user_id,status)`; Leaders can read only their own private records. There is no Champion membership role. |
+| `platform_role_assignments` | id, user_id, role (`admin`), assigned_by, assigned_at, revoked_at | Unique active application Admin role; grant/revoke restricted and audited. Do not map the Admin to the Statamic CP user automatically. |
+| `invitations` | id, organization_id, invited_email, target_role (`leader`), token_digest, expires_at, accepted_by, accepted_at, revoked_at, created_by | Admin-created invitations always target Leader; unique digest; no stored plaintext token; consume under row lock only for correct verified account; replay/expiry/revocation rejected. |
 | `user_preferences` | user_id, week_start, locale, reminders_opt_in, timestamps | Unique user; week_start restricted to supported values; no sensitive data. Locale readiness does not imply approved Arabic content. |
 | `privacy_acceptances` | id, user_id, notice_version, purpose, accepted_at, withdrawn_at | Minimal acceptance record; versioned notice reference, not a copy of private answers. Withdrawal handled by privacy workflow. |
 
@@ -79,18 +78,17 @@ Lock the plan while taking a closure snapshot. Reject stale versions and duplica
 | `deletion_requests` | id, user_id, organization_id nullable, scope, requested_at, completed_at, status | Authorized erasure workflow with explicit retained facts. Store no deleted sensitive content in the request reason/log. |
 | `privacy_tombstones` | id, subject_reference, scope, effective_at, retention_until | Minimal recovery-suppression ledger, held for approved backup horizon. Replay after restore before data is re-exposed. Do not use tombstones as a shadow copy of the deleted content. |
 
-Do not expose existence, counts, completion flags, export-request metadata, notification types or “last well-being use” to Champion/Taleed/content administrators. API list/count routes, health dashboards and support tooling must respect that boundary, not just the detail endpoint.
+Do not expose existence, counts, completion flags, export-request metadata, notification types or “last well-being use” from private records to the Admin. API list/count routes, health dashboards and support tooling must respect that boundary, not just the detail endpoint.
 
 ## 5. Explicit organization sharing
 
 | Table | Important columns | Constraints / indexes / meaning |
 |---|---|---|
-| `sharing_periods` | id, organization_id, month, current_summary_id nullable, next_version, lock_version | Unique `(organization_id,month)`; serialized pointer establishes one effective share without pretending MySQL has partial unique indexes. |
-| `sharing_candidates` | id, sharing_period_id, created_by, source_revision_fingerprint, frozen_allowlist_payload, payload_hash, expires_at, consumed_at | Preview produces a server-owned frozen candidate; confirmation checks its exact hash/source revisions/expiry and current Champion permission. No arbitrary client-supplied summary JSON. |
-| `shared_summaries` | id, sharing_period_id, version_number, approved_payload_json, payload_hash, shared_by, shared_at, status, withdrawn_at | Unique `(sharing_period_id,version_number)`; immutable payload. Transactionally supersede/withdraw and update current pointer. Public response omits internal actor/source IDs. |
+| `sharing_periods` | id, organization_id, month, current_summary_id nullable, next_version, lock_version | Unique `(organization_id,month)`; the close transaction/outbox serializes automatic report creation and one effective version. |
+| `shared_summaries` | id, sharing_period_id, version_number, source_revision_fingerprint, approved_payload_json, payload_hash, shared_at, status, withdrawn_at | Created automatically from the closed revision; unique `(sharing_period_id,version_number)`; immutable allowlisted payload. No Champion approval or browser confirmation. |
 | `shared_summary_sources` | summary_id, plan_closure_id | Internal traceability only; never returned to analysts/exports if it exposes owner/plan identifiers. Not a route to private payloads. |
 
-Shared payload shape is exactly the allowlist in `API-CONTRACT.md`. All narrative fields are excluded by construction. Organization name/ID are allowed organization-level information; individual identities are not. Review small-cohort disclosure controls with the data owner before enabling sharing. Recheck analyst assignment and effective-share status during export generation and download.
+Shared payload shape is exactly the allowlist in `API-CONTRACT.md`. All narrative fields are excluded by construction. Organization name/ID are allowed organization-level information; individual identities are not. Automatic publication does not weaken the allowlist or privacy gate. Recheck Admin organization scope and effective-share status during report generation and download.
 
 ## 6. Reliability and operations
 

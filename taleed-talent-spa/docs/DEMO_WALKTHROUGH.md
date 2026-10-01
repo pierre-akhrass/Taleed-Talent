@@ -46,19 +46,15 @@ Enter eight ratings and confirm that no total is shown. Add the ninth. Use the d
 
 Choose a focus dimension and write three personal actions. Complete, open the report and then create a correction revision. The profile should never appear on a Champion or Taleed dashboard, including as a participation count.
 
-## Journey 6: Champion sharing → Taleed view
+## Journey 6: Automatic monthly report
 
-Switch to **Noor Saleh**, choose **August 2026** in the header, and open Summary & sharing. This seeded record has **five scheduled occurrences, one cancelled, two completed from four eligible, 50% follow-through and two of three scopes delivered**.
+As **Amina Hassan**, close the September plan honestly. The safe organization report is created automatically from the closed snapshot; no Champion approval, preview or send action is shown.
 
-Open Preview & share. Show the exact JSON field list. There are no leader names, aliases, private notes, custom activity titles, conversation records or well-being fields. Tick the explicit confirmation and share in the browser demo.
-
-Switch to **Mariam Ahmed** and open Shared portfolio. The same effective summary should be visible for the assigned Cedar Works cohort. Review the exact filter/row preview before CSV export. Do not describe not-shared companies as zero performers.
-
-Return to the Champion, share a replacement revision, and verify that the analyst counts one effective summary. Withdraw it and confirm it disappears from the effective portfolio. Explain that downloaded copies cannot be recalled.
+Switch to **Hassan Abdullah**, open Shared reports, and verify the same allowlisted aggregate fields: no leader names, aliases, private notes, custom activity titles, conversation records or well-being fields. Review the exact filter/row preview before export. Do not describe missing or unfinished reports as zero performers.
 
 ## Journey 7: Membership and source governance
 
-As Noor, invite a fictional leader using an `example.test` address. No email is sent. Test acceptance using the exact invited address; also demonstrate expired, revoked and already-used states. There is no automatic organization access based on domain matching.
+As **Hassan Abdullah**, invite a fictional leader using an `example.test` address. No email is sent. Test acceptance using the exact invited address; also demonstrate expired, revoked and already-used states. There is no automatic organization access based on domain matching.
 
 As **Hassan Abdullah**, open Content workspace. Show seven source metadata records and their dependencies. Create a draft activity revision, compare it with its predecessor and attempt publication while the source is unresolved; this must be blocked. For a clearly labeled simulation, resolve the dependency and record demo approval, then publish. Old plan content must not change.
 

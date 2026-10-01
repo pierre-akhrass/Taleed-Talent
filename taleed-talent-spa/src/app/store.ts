@@ -31,17 +31,24 @@ catch (error) {
 export const store = configureStore({ reducer: { planning: planningSlice.reducer, privateData: privateSlice.reducer, organization: organizationSlice.reducer, catalogue: catalogueSlice.reducer, preferences: preferencesSlice.reducer, session: sessionSlice.reducer, ui: uiSlice.reducer }, middleware: getDefault => getDefault().prepend(listener.middleware) });
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export function persistedData(s: Pick<RootState, keyof PersistedData>): PersistedData { return { planning: s.planning, privateData: s.privateData, organization: s.organization, catalogue: s.catalogue, preferences: s.preferences }; }
+export function persistedData(s: Pick<RootState, keyof PersistedData>): PersistedData {
+    const summaries = Object.fromEntries(Object.entries(s.organization.summaries).filter(([, share]) => {
+        const p = share.payload;
+        return Boolean(s.organization.organizations[p.organizationId]) && p.eligible === p.scheduled - p.cancelled && p.completed + p.blocked + p.inProgress <= p.eligible && p.fullyCoveredDevelopmentPlans <= p.closedPlans;
+    }));
+    return { planning: s.planning, privateData: s.privateData, organization: { ...s.organization, summaries }, catalogue: s.catalogue, preferences: s.preferences };
+}
 store.dispatch(hydrate(bootData));
 if (bootError)
     store.dispatch(actions.ui.issue({ status: 'blocked', message: `Existing data was not overwritten. ${bootError} Use Data & settings to export the original or explicitly reset the demo.` }));
 const startListening = listener.startListening.withTypes<RootState, AppDispatch>();
 let dirty = false;
 startListening({ predicate: (a) => ['planning/', 'privateData/', 'organization/', 'catalogue/', 'preferences/'].some(p => a.type.startsWith(p)) || a.type === actions.ui.retry.type,
-    effect: async (_action, api) => {
+    effect: async (action, api) => {
         api.cancelActiveListeners();
         dirty = true;
-        if (['blocked', 'conflict'].includes(api.getState().ui.saveStatus))
+        const retrying = action.type === actions.ui.retry.type;
+        if (api.getState().ui.saveStatus === 'blocked' || (api.getState().ui.saveStatus === 'conflict' && !retrying))
             return;
         api.dispatch(actions.ui.saving());
         await api.delay(350);

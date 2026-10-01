@@ -54,8 +54,8 @@ Use MySQL, not a SQLite-only substitute. Add synthetic organizations/users only
 through explicit local factories.
 
 Implement independent Eloquent application and Statamic CP guards/providers/
-password brokers. Build real registration, verification, login/logout, reset,
-invitation expiry/replay protection and role/organization authorization. Use
+password brokers. Build real sign-in/out, verification, reset, Admin-created
+Leader invitation expiry/replay protection and role/organization authorization. Use
 Sanctum first-party cookies/CSRF, session rotation and rate limits. Prove that
 app users cannot enter the CP and CP login alone cannot read application APIs.
 No role or existing organization access may come from untrusted signup fields.
@@ -74,7 +74,8 @@ Exit: real local authentication and MySQL identity/policy tests; agreed schema a
 Implement Phase 3 using the frozen contract. Build Talent domain services and
 API for approved catalogue/version visibility, bookmarks, private custom Develop
 activities, drafts, activation, commitments, schedule versions, occurrences,
-metrics, close/reopen and immutable closure history. Derive tenant/owner from
+metrics, close/reopen, immutable closure history and automatic Taleed monthly
+reports. Derive tenant/owner from
 authenticated context; enforce policies in queries, downloads and jobs.
 
 Port existing pure rules with shared fixtures. Preserve exact Pick-3 scope/theme
@@ -120,8 +121,8 @@ Exit: existing UI reads/writes the server and survives refresh/account sessions 
 ```text
 Implement Phase 5: verified source-version upload/import/approval and business
 catalogue administration; bounded Statamic Core guidance editing; private
-conversations/reflections/well-being; owner exports/retention/deletion; explicit
-organization preview-confirm sharing and assigned-analyst portfolio/exports.
+conversations/reflections/well-being; owner exports/retention/deletion; automatic
+organization reports available to the Taleed role.
 Use the approved API/schema privacy boundaries, not generic CRUD serialization.
 
 Treat original PDFs as authoritative and samples as unapproved. Source imports
@@ -131,9 +132,10 @@ approved; test 35 and 60 in all views. Keep real private collection disabled unt
 its separate privacy/content gates are cleared. Never infer those approvals from
 general UI approval.
 
-Build frozen sharing candidates with source fingerprints and exact payload hashes,
-transactional supersede/withdraw, safe aggregate serializers and assignment checks.
-Exclude private contents AND participation metadata from employer/Taleed access.
+Build automatic closed-month summaries with source fingerprints and exact payload
+hashes, transactional supersede/withdraw, safe aggregate serializers and Admin
+organization-scope checks. Exclude private contents AND participation metadata
+from every report.
 Add encrypted private storage, key-version/deletion recovery handling, secure
 reports/downloads, neutral opt-in queued reminders and SMTP configuration examples.
 Test negative access, upload/report security, retry deduplication and no sensitive
