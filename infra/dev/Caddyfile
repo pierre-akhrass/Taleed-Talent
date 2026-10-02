@@ -1,0 +1,16 @@
+https://talent.taleed.test {
+    tls internal
+
+    @backend path /up /ready /help* /cp* /app* /api* /auth* /sanctum* /vendor/statamic/*
+    handle @backend {
+        reverse_proxy backend:8000
+    }
+
+    handle {
+        reverse_proxy vite:5173 {
+            transport http {
+                versions 1.1
+            }
+        }
+    }
+}

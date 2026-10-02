@@ -1,0 +1,218 @@
+openapi: 3.1.0
+info:
+  title: Taleed Talent Application API
+  version: 1.0.0
+  description: Local Phase 2 identity and session contract. Business domain endpoints are added in later phases.
+servers:
+  - url: https://talent.taleed.test:9443
+security:
+  - laravelSession: []
+paths:
+  /sanctum/csrf-cookie:
+    get:
+      operationId: csrfCookie
+      security: []
+      responses:
+        '204':
+          description: XSRF-TOKEN cookie issued.
+  /auth/login:
+    post:
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated application session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '403':
+          description: MFA is required for a staff account.
+        '419':
+          $ref: '#/components/responses/CsrfExpired'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /auth/logout:
+    post:
+      operationId: logout
+      responses:
+        '200':
+          description: Session invalidated and CSRF token rotated.
+  /api/v1/me:
+    get:
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Current application identity and active memberships.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /api/v1/admin/organizations:
+    post:
+      operationId: createOrganization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationRequest'
+      responses:
+        '201':
+          description: Organization created.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '419':
+          $ref: '#/components/responses/CsrfExpired'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/admin/organizations/{organizationId}/invitations:
+    post:
+      operationId: createLeaderInvitation
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationRequest'
+      responses:
+        '201':
+          description: Single-use invitation created. The token is returned once.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Organization not found in the caller's authorized scope.
+        '419':
+          $ref: '#/components/responses/CsrfExpired'
+  /api/v1/invitations/accept:
+    post:
+      operationId: acceptLeaderInvitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  minLength: 64
+                  maxLength: 64
+                  writeOnly: true
+      responses:
+        '200':
+          description: Active Leader membership created.
+        '403':
+          description: Verified email or invited-email match is required.
+        '410':
+          description: Invitation is expired, revoked, or already consumed.
+        '419':
+          $ref: '#/components/responses/CsrfExpired'
+components:
+  securitySchemes:
+    laravelSession:
+      type: apiKey
+      in: cookie
+      name: taleed-talent-session
+  parameters:
+    OrganizationId:
+      name: organizationId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          writeOnly: true
+        remember:
+          type: boolean
+          default: false
+    UserResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, email, displayName, emailVerified, applicationAdmin, organizations]
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+              format: email
+            displayName:
+              type: string
+            emailVerified:
+              type: boolean
+            applicationAdmin:
+              type: boolean
+            organizations:
+              type: array
+              items:
+                type: object
+                required: [id, name, role]
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  role:
+                    type: string
+                    enum: [leader, taleed]
+    OrganizationRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        sector:
+          type: string
+        city:
+          type: string
+        timezone:
+          type: string
+    InvitationRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+        expires_at:
+          type: string
+          format: date-time
+  responses:
+    Unauthenticated:
+      description: Application session is missing or expired.
+    Forbidden:
+      description: The authenticated application user is not authorized.
+    CsrfExpired:
+      description: CSRF token is missing or expired.
+    ValidationError:
+      description: Request validation failed.
+    RateLimited:
+      description: Too many requests.

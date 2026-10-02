@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
+    "build:backend": "tsc --noEmit && node scripts/build-backend.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -23,30 +24,30 @@
     "format:check": "prettier --check src tests e2e scripts"
   },
   "dependencies": {
-    "@hookform/resolvers": "latest",
+    "@hookform/resolvers": "5.9.1",
     "@reduxjs/toolkit": "2.12.0",
-    "lucide-react": "latest",
+    "lucide-react": "1.46.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-hook-form": "latest",
-    "react-redux": "latest",
-    "react-router-dom": "latest",
-    "zod": "latest"
+    "react-hook-form": "7.88.0",
+    "react-redux": "9.3.0",
+    "react-router-dom": "7.18.4",
+    "zod": "3.25.76"
   },
   "devDependencies": {
-    "@axe-core/playwright": "latest",
-    "@playwright/test": "latest",
-    "@testing-library/jest-dom": "latest",
-    "@testing-library/react": "latest",
-    "@testing-library/user-event": "latest",
-    "@types/node": "latest",
+    "@axe-core/playwright": "4.11.0",
+    "@playwright/test": "1.56.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.0",
+    "@testing-library/user-event": "14.6.1",
+    "@types/node": "24.10.1",
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.5",
-    "@vitejs/plugin-react": "latest",
+    "@vitejs/plugin-react": "6.1.1",
     "jsdom": "29.0.1",
-    "prettier": "latest",
-    "typescript": "latest",
-    "vite": "latest",
-    "vitest": "latest"
+    "prettier": "3.7.4",
+    "typescript": "7.0.2",
+    "vite": "8.3.0",
+    "vitest": "5.0.1"
   }
 }

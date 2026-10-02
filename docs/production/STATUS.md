@@ -1,7 +1,7 @@
 # Taleed Talent — delivery plan and status
 
 **Owner / decision maker:** Director (Fadi Zahhar)
-**Last updated:** 30 September 2026 — Phase 0 complete, Phase 1 not started
+**Last updated:** 1 October 2026 — Phases 0–2 local implementation complete; HTTPS HMR proxy limitation recorded
 **Audience:** the implementing developer (using Claude Code or Codex) and the director
 
 This file is the developer's single entry point. Read it first, then `AGENTS.md`, `docs/production/MASTER-PROMPT.md` and the specifications it references. **Director decisions in §2 are binding and override any conflicting default in the other specifications.** Update §5 and §7 at the end of every phase.
@@ -13,8 +13,8 @@ This file is the developer's single entry point. Read it first, then `AGENTS.md`
 | Phase | Scope | Status | Estimate (dev-days) | Exit evidence |
 |---|---|---|---|---|
 | 0 | Read-only discovery and architecture proposal | **Done — 30 Sep 2026** | — | §3 of this file |
-| 1 | Local foundation: Laravel + Statamic 6 Core, Docker, local HTTPS, root CI | Not started | 5–7 | App, `/help`, `/cp`, `/api/v1/health` running on `https://talent.taleed.test`; CI green |
-| 2 | MySQL schema, independent auth guards, invitations, policies, frozen OpenAPI | Not started | 8–10 | MySQL feature tests for guards, tenants, invitations; `contracts/openapi.yaml` v1 |
+| 1 | Local foundation: Laravel + Statamic 6 Core, Docker, local HTTPS, root CI | **Complete locally except HTTPS HMR proxy — Compose runtime, worker/scheduler, HTTPS routes, SPA integration, restart persistence and local CI-equivalent checks pass; Caddy/Vite websocket upgrade remains blocked** | 5–7 | App, `/help`, `/cp`, `/up` running on `https://talent.taleed.test:9443`; root CI workflow present |
+| 2 | MySQL schema, independent auth guards, invitations, policies, frozen OpenAPI | **Complete locally — MySQL identity schema, independent guards, invitation/reset/verification/MFA boundaries, policies, contract and feature tests pass** | 8–10 | MySQL feature tests for guards, tenants, invitations, MFA/reset; `contracts/openapi.yaml` v1 |
 | 3 | Domain API: catalogue, plans, schedules, occurrences, close/reopen | Not started | 10–13 | Concurrency + history tests on MySQL |
 | 4 | Connect approved React UI to the API; remove demo personas/localStorage | Not started | 10–13 | Playwright journeys over HTTPS against Laravel/MySQL |
 | 5 | Source import/approval, CMS guidance, private features (flagged off), sharing, reports, email | Not started | 12–15 | Privacy negative tests; sharing freeze tests |
@@ -124,6 +124,14 @@ The developer starts each phase by pasting the matching message from `docs/produ
 - Root CI (PHP tests on MySQL, frontend typecheck/tests/build); Pages set to manual demo only (D13).
 - Done when: a fresh clone runs over trusted HTTPS with the commands documented, restarts without losing data, and CI is green.
 
+**Phase 2 complete — 1 October 2026**
+- Added locked Laravel Fortify `v1.40.0`, Sanctum `v4.3.3` and Passkeys `v0.2.1` dependencies.
+- Added the MySQL identity migration for normalized users, organizations, memberships, platform roles, invitations, preferences, privacy acceptances and installation identity.
+- Added separate `app` Eloquent and Statamic guards, application login/logout/profile, CSRF-protected sessions, admin-only Leader invitations and atomic verified-email invitation consumption.
+- Added synthetic feature coverage for CSRF, guard separation, tenant membership, invitation expiry/replay boundary and role enforcement.
+- Verification and TOTP routes are registered through Fortify; application password reset uses an isolated Eloquent database-token service because Statamic owns the global flat-file broker.
+- Local tests cover CSRF, invitation-only registration, password reset notification, staff MFA blocking, guard separation, tenant policy, verified-email matching, expiry and replay protection.
+
 **Phase 2 — Schema and identity (8–10 days)**
 - Migrations for identity, organizations, memberships, platform roles, analyst assignments, invitations, preferences, source/activity versions, plans (with D10 unique key), commitments, schedules, occurrences (with superseded status and active-date uniqueness), closures, private payloads, sharing, idempotency, outbox, audit, installation identity.
 - Independent `app` and Statamic guards and password brokers; invitation-only onboarding (D9); email verification; password reset; session security; rate limits; TOTP for staff (D11).
@@ -185,5 +193,7 @@ The developer starts each phase by pasting the matching message from `docs/produ
 | Date | Phase | Commit | Result | Evidence |
 |---|---|---|---|---|
 | 2026-09-30 | 0 | `5e33846` | Discovery complete; director decisions D1–D16 recorded | This file, §2–§3 |
+| 2026-10-01 | 0/1 | working tree | Phase 0 revalidated; Laravel 13.34.0 + Statamic Core 6.34.0 local scaffold, route tests and Compose config verified; Docker image build stopped during slow dependency downloads | `docs/production/evidence/phase0-current-2026-10-01.md` |
+| 2026-10-01 | 1/2 | working tree | Local foundation and identity phases completed; MySQL 8.4 migrations applied; worker/scheduler running; full local Laravel suite and frontend checks passed; HTTPS HMR proxy limitation remains | `docs/production/evidence/phase2-current-2026-10-01.md` |
 
 Production URL: **none — not deployed.** A Pages demo, a planned address or a local URL is never recorded here as production.
