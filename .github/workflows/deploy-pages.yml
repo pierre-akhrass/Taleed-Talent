@@ -1,9 +1,14 @@
 name: Deploy Taleed Talent to GitHub Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      deployment_target:
+        description: Confirm this is the synthetic demo only
+        required: true
+        type: choice
+        options:
+          - synthetic-demo
 
 permissions:
   contents: read
@@ -16,6 +21,7 @@ concurrency:
 
 jobs:
   build:
+    if: inputs.deployment_target == 'synthetic-demo'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -48,6 +54,7 @@ jobs:
           path: taleed-talent-spa/dist
 
   deploy:
+    if: inputs.deployment_target == 'synthetic-demo'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

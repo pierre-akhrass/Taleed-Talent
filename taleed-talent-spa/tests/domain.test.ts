@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { makeSeed } from '../src/data/seed';
-import { calendarDays, emptyScores, planMetrics, safeSummary, wheelErrors, wheelTotal } from '../src/domain/logic';
-import { dimensions, type Wellbeing } from '../src/domain/types';
+import { calendarDays, emptyScores, expandSchedule, planMetrics, safeSummary, validPickThree, validateSchedule, wheelErrors, wheelTotal } from '../src/domain/logic';
+import { dimensions, type Occurrence, type Plan, type Wellbeing } from '../src/domain/types';
+import planningRules from '../../contracts/fixtures/planning-rules.json';
 describe('Talent practice rules',()=>{
+ it('matches the shared server/client Pick-3 fixtures',()=>{for(const fixture of planningRules.pickThree){const selections=fixture.activities.map(activity=>({theme:activity.theme,scope:activity.scope,status:activity.available?'available' as const:'retired' as const}));expect(validPickThree(fixture.theme,selections),fixture.name).toBe(fixture.valid);}});
+ it('matches the shared server/client schedule fixtures',()=>{for(const fixture of planningRules.schedules){const schedule={cadence:fixture.cadence==='one_off'?'once' as const:fixture.cadence as 'daily'|'weekly',start:fixture.startDate,end:fixture.endDate,weekdays:fixture.weekdays as number[]};if(fixture.dates===null){expect(validateSchedule(schedule,'2026-10',fixture.theme),fixture.name).not.toHaveLength(0);}else{expect(expandSchedule(schedule),fixture.name).toEqual(fixture.dates);}}});
+ it('matches shared schedule metric and completed-scope fixtures',()=>{const fixture=planningRules.metrics,plan={id:'shared-metrics',items:fixture.commitments.map(commitment=>({id:commitment.id,activity:{scope:commitment.scope}}))} as unknown as Plan;const occurrences=fixture.occurrences.map((occurrence,index)=>({id:`occurrence-${index}`,planId:plan.id,commitmentId:occurrence.commitmentId,date:'2026-10-01',status:occurrence.status as Occurrence['status'],note:''}));expect(planMetrics(plan,occurrences)).toEqual(fixture.expected);});
  it('reports 2 of 4 eligible occurrences and two delivered scopes',()=>{const seed=makeSeed(),record=seed.planning.snapshots['snapshot-seed'],m=planMetrics(record.plan,record.occurrences);expect(m).toMatchObject({scheduled:5,completed:2,eligible:4,cancelled:1,rate:50,coverage:['individual','team']});});
  it('does not imply progress when nothing is scheduled',()=>{const seed=makeSeed();expect(planMetrics(seed.planning.plans['plan-current'],[]).rate).toBeNull();});
  it('supports a real four/five/six week calendar',()=>{expect(calendarDays('2026-02')).toHaveLength(28);expect(calendarDays('2026-09')).toHaveLength(35);expect(calendarDays('2026-05')).toHaveLength(42);});

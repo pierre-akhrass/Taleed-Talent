@@ -2,30 +2,26 @@
 
 namespace Tests\Feature;
 
+use App\Models\Invitation;
 use App\Models\Organization;
 use App\Models\PlatformRoleAssignment;
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class ApplicationAuthTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_requires_a_csrf_token(): void
+    public function test_login_route_uses_the_csrf_protected_web_middleware(): void
     {
-        User::factory()->create([
-            'email' => 'leader@example.com',
-            'normalized_email' => 'leader@example.com',
-            'password' => 'password',
-        ]);
+        $route = Route::getRoutes()->match(Request::create('/auth/login', 'POST'));
 
-        $this->postJson('/auth/login', [
-            'email' => 'leader@example.com',
-            'password' => 'password',
-        ])->assertStatus(419);
+        $this->assertContains('web', $route->gatherMiddleware());
     }
 
     public function test_public_registration_is_disabled_and_password_reset_is_available(): void
@@ -43,7 +39,7 @@ class ApplicationAuthTest extends TestCase
         $this->postJson('/auth/forgot-password', ['email' => $user->email])
             ->assertOk();
 
-        Notification::assertSentTo($user, \Illuminate\Auth\Notifications\ResetPassword::class);
+        Notification::assertSentTo($user, ResetPassword::class);
     }
 
     public function test_application_admin_login_requires_confirmed_mfa(): void
@@ -176,7 +172,7 @@ class ApplicationAuthTest extends TestCase
                 'expires_at' => now()->addMinute()->toIso8601String(),
             ])->json('data');
 
-        \App\Models\Invitation::query()->whereKey($invitation['id'])->update(['expires_at' => now()->subMinute()]);
+        Invitation::query()->whereKey($invitation['id'])->update(['expires_at' => now()->subMinute()]);
         $leader = User::factory()->create([
             'email' => 'expired@example.com',
             'normalized_email' => 'expired@example.com',

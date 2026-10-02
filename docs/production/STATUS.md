@@ -1,7 +1,7 @@
 # Taleed Talent — delivery plan and status
 
 **Owner / decision maker:** Director (Fadi Zahhar)
-**Last updated:** 1 October 2026 — Phases 0–2 local implementation complete; HTTPS HMR proxy limitation recorded
+**Last updated:** 2 October 2026 — Phases 1 and 3 implemented locally; Windows certificate trust and hosted CI remain unverified
 **Audience:** the implementing developer (using Claude Code or Codex) and the director
 
 This file is the developer's single entry point. Read it first, then `AGENTS.md`, `docs/production/MASTER-PROMPT.md` and the specifications it references. **Director decisions in §2 are binding and override any conflicting default in the other specifications.** Update §5 and §7 at the end of every phase.
@@ -13,9 +13,9 @@ This file is the developer's single entry point. Read it first, then `AGENTS.md`
 | Phase | Scope | Status | Estimate (dev-days) | Exit evidence |
 |---|---|---|---|---|
 | 0 | Read-only discovery and architecture proposal | **Done — 30 Sep 2026** | — | §3 of this file |
-| 1 | Local foundation: Laravel + Statamic 6 Core, Docker, local HTTPS, root CI | **Complete locally except HTTPS HMR proxy — Compose runtime, worker/scheduler, HTTPS routes, SPA integration, restart persistence and local CI-equivalent checks pass; Caddy/Vite websocket upgrade remains blocked** | 5–7 | App, `/help`, `/cp`, `/up` running on `https://talent.taleed.test:9443`; root CI workflow present |
-| 2 | MySQL schema, independent auth guards, invitations, policies, frozen OpenAPI | **Complete locally — MySQL identity schema, independent guards, invitation/reset/verification/MFA boundaries, policies, contract and feature tests pass** | 8–10 | MySQL feature tests for guards, tenants, invitations, MFA/reset; `contracts/openapi.yaml` v1 |
-| 3 | Domain API: catalogue, plans, schedules, occurrences, close/reopen | Not started | 10–13 | Concurrency + history tests on MySQL |
+| 1 | Local foundation: Laravel + Statamic 6 Core, Docker, local HTTPS, root CI | **Implemented and runtime-verified locally. HMR/restart/routes pass; installing the local root CA into the Windows trust store awaits machine-owner approval. GitHub-hosted CI was not run.** | 5–7 | Evidence: `docs/production/evidence/phase1-complete-2026-10-02.md` |
+| 2 | MySQL schema, independent auth guards, invitations, policies, frozen OpenAPI | **Complete locally — domain schema, tenant/owner constraints, versioned planning/catalogue records, private payload separation, analyst assignments, owner policies, frozen v1 contract, and database verification complete.** | 8–10 | Isolated MySQL 8.4 migrations; MySQL and SQLite suites pass 16 tests / 787 assertions; local HTTP CSRF probe returns 419 |
+| 3 | Domain API: catalogue, plans, schedules, occurrences, close/reopen | **Complete locally against the frozen v1 contract, including private custom Develop activities/bookmarks/notes, reports, shared PHP/TypeScript fixtures, and five MySQL process-race tests.** | 10–13 | Evidence: `docs/production/evidence/phase3-complete-2026-10-02.md` |
 | 4 | Connect approved React UI to the API; remove demo personas/localStorage | Not started | 10–13 | Playwright journeys over HTTPS against Laravel/MySQL |
 | 5 | Source import/approval, CMS guidance, private features (flagged off), sharing, reports, email | Not started | 12–15 | Privacy negative tests; sharing freeze tests |
 | 6 | Production data safety: prod Compose, guards, backup/restore, rollback, ops tests | Not started | 8–11 | Two-release survival, restore rehearsal, failure-mode tests |
@@ -119,12 +119,12 @@ The developer starts each phase by pasting the matching message from `docs/produ
 - Replace `taleed-talent-spa/AGENTS.md` with production frontend rules; add superseded banners to its README and `CODEX_MASTER_PROMPT.md`.
 - Pin exact npm versions from the lockfile; standardize Node 24.
 - Create `backend/` with locked Laravel + Statamic 6 Core (Pro off), Fortify, Sanctum.
-- Dev Compose (app, worker, scheduler, MySQL 8.4, Mailpit, Vite, HTTPS proxy), `.env.example`, Makefile (`dev-init`, `dev-up`, `test`, `dev-down`, `reset-local-synthetic`).
-- Serve the built SPA at `/app`, one sample `/help` page, health endpoints; test route precedence.
-- Root CI (PHP tests on MySQL, frontend typecheck/tests/build); Pages set to manual demo only (D13).
-- Done when: a fresh clone runs over trusted HTTPS with the commands documented, restarts without losing data, and CI is green.
+- Dev Compose (app, worker, scheduler, MySQL 8.4, Mailpit, Vite, HTTPS proxy), `.env.example`, and `scripts/dev/dev.ps1` (`init`, `up`, `test`, `build`, `down`, `reset-test`). The reset action is scoped to the synthetic test schema only.
+- Serve the built SPA at `/app`, a Statamic Core Antlers help page at `/help`, database-backed readiness, and route separation for `/cp`, `/api`, auth, and assets.
+- Root CI (PHP tests on MySQL, frontend typecheck/tests/build); Pages is manual-trigger synthetic-demo-only (D13).
+- Local exit checks pass, including HTTPS Vite WebSocket HMR and a synthetic marker surviving all service restarts. Windows root-CA trust and GitHub-hosted CI remain unverified; no host trust/hosts-file edits or pushes were made.
 
-**Phase 2 complete — 1 October 2026**
+**Phase 2 identity slice — 1 October 2026**
 - Added locked Laravel Fortify `v1.40.0`, Sanctum `v4.3.3` and Passkeys `v0.2.1` dependencies.
 - Added the MySQL identity migration for normalized users, organizations, memberships, platform roles, invitations, preferences, privacy acceptances and installation identity.
 - Added separate `app` Eloquent and Statamic guards, application login/logout/profile, CSRF-protected sessions, admin-only Leader invitations and atomic verified-email invitation consumption.
@@ -132,18 +132,25 @@ The developer starts each phase by pasting the matching message from `docs/produ
 - Verification and TOTP routes are registered through Fortify; application password reset uses an isolated Eloquent database-token service because Statamic owns the global flat-file broker.
 - Local tests cover CSRF, invitation-only registration, password reset notification, staff MFA blocking, guard separation, tenant policy, verified-email matching, expiry and replay protection.
 
-**Phase 2 — Schema and identity (8–10 days)**
-- Migrations for identity, organizations, memberships, platform roles, analyst assignments, invitations, preferences, source/activity versions, plans (with D10 unique key), commitments, schedules, occurrences (with superseded status and active-date uniqueness), closures, private payloads, sharing, idempotency, outbox, audit, installation identity.
-- Independent `app` and Statamic guards and password brokers; invitation-only onboarding (D9); email verification; password reset; session security; rate limits; TOTP for staff (D11).
-- Policies that deny by default; freeze `contracts/openapi.yaml` v1 and generated TypeScript types.
-- Done when: MySQL tests prove wrong-guard denial, cross-tenant denial, invitation expiry/replay/race safety and no role injection.
+**Phase 2 completed locally — 2 October 2026**
+- Added the complete initial MySQL schema for source/activity versions, drafts, plans, pinned commitments, schedule versions, stable occurrences, closures, private payloads, conversations/well-being, exports/deletion/tombstones, assigned Taleed reporting, idempotency, outbox and audit.
+- Added tenant-composite ownership constraints, D10 one-plan-per-Leader/month uniqueness, version-parent constraints, generated active occurrence-date uniqueness, and private ciphertext omission from model serialization.
+- Added Eloquent models/relationships and explicit owner-only Plan, Conversation and WellbeingEntry policies with no Admin bypass.
+- Froze the v1 identity/domain contract in `contracts/openapi.yaml`; documented that schema presence is not route implementation. Phase 3 builds the planning API; Phase 5 implements the privacy-gated/content-gated endpoints.
+- Corrected the CSRF PHPUnit test to assert route middleware assignment. Laravel skips CSRF validation in unit tests by design; an actual local HTTP POST without a token returned 419.
+- Clean isolated MySQL 8.4 migration passed; backend suites passed on MySQL and SQLite with 16 tests / 787 assertions each; frontend check passed 19 tests and production build. Exact evidence is in `docs/production/evidence/phase2-complete-2026-10-02.md`.
+
+The earlier 2 October SQLite assertion failure was a test-harness mismatch, not a runtime CSRF defect. Phase 2 is complete locally; production migrations were not run.
 
 **Phase 3 — Domain API (10–13 days)**
 - Catalogue and source visibility (published only), bookmarks, private custom Develop activities.
 - Drafts, Pick-3 activation, schedule versions, calendar, occurrence transition/reschedule/note commands, metrics.
 - Close/reopen with immutable revisions; latest-closed-revision aggregation; expected-version conflicts; idempotency keys.
-- Port the 41 prototype domain checks as shared fixtures run by both PHP and TypeScript.
-- Done when: concurrent-request tests on MySQL show no duplicate occurrences, no lost history and correct conflicts.
+- Preserve and run the existing 41 pure-domain checks. Shared `contracts/fixtures/planning-rules.json` cases exercise Pick-3, recurrence, and plan metrics in both PHP and TypeScript; the remaining UI-only/content/private checks stay in their existing client suite or later phases.
+- MySQL multi-process races cover activation, schedule-version replacement, rescheduling collisions, close, and idempotent reopen; each asserts database state/history, not only HTTP status.
+- Complete locally: custom Develop activities are immutable-versioned and owner-only; bookmarks follow visibility; additional Develop commitments are owner-checked; occurrence notes are encrypted/private; close/reopen reports use latest closed revisions; idempotency hashes include target IDs.
+- Sharing remains disabled by default. Source approval, small-cohort policy, private-conversation/well-being enablement, production data, and production deployment remain separately gated.
+- Done locally: full backend suite passes on isolated MySQL 8.4; production database and services were not accessed.
 
 **Phase 4 — Connect the UI (10–13 days)**
 - RTK Query against the API; real sign-in/out and invitation acceptance screens; remove personas, localStorage data, backup/import and reset.
@@ -195,5 +202,9 @@ The developer starts each phase by pasting the matching message from `docs/produ
 | 2026-09-30 | 0 | `5e33846` | Discovery complete; director decisions D1–D16 recorded | This file, §2–§3 |
 | 2026-10-01 | 0/1 | working tree | Phase 0 revalidated; Laravel 13.34.0 + Statamic Core 6.34.0 local scaffold, route tests and Compose config verified; Docker image build stopped during slow dependency downloads | `docs/production/evidence/phase0-current-2026-10-01.md` |
 | 2026-10-01 | 1/2 | working tree | Local foundation and identity phases completed; MySQL 8.4 migrations applied; worker/scheduler running; full local Laravel suite and frontend checks passed; HTTPS HMR proxy limitation remains | `docs/production/evidence/phase2-current-2026-10-01.md` |
+| 2026-10-02 | 2 | working tree | Phase 2 schema/identity contract complete locally. MySQL 8.4 migration passes; MySQL and SQLite each pass 16 backend tests / 787 assertions; frontend 19 tests/build pass; local HTTP CSRF check returns 419. No production access or migrations. | `docs/production/evidence/phase2-complete-2026-10-02.md` |
+| 2026-10-02 | 3 progress | working tree | Local API slice implemented and gated reports remain off by default. Fresh MySQL 8.4 migration passed; full suite passes 24 tests / 1,003 assertions on MySQL and SQLite. No production access, mail, migrations, or deployment. | `docs/production/evidence/phase3-progress-2026-10-02.md` |
+| 2026-10-02 | 1 complete locally | working tree | Node 24.10.0 digest-pinned local Compose, Laravel/Statamic routes, database readiness, restart persistence, HTTPS browser HMR, setup/test/build scripts, root CI test gate, and manual synthetic-only Pages workflow verified. Local CA trust installation and hosted CI remain unrun. | `docs/production/evidence/phase1-complete-2026-10-02.md` |
+| 2026-10-02 | 3 complete locally | working tree | Catalog/planning/schedule/occurrence note/closure/report-read API, explicit allowlist, shared planning fixtures, and five MySQL multi-process races pass. Frontend 22 tests; backend 36 tests / 1,318 assertions. Sharing remains off by default. | `docs/production/evidence/phase3-complete-2026-10-02.md` |
 
 Production URL: **none — not deployed.** A Pages demo, a planned address or a local URL is never recorded here as production.

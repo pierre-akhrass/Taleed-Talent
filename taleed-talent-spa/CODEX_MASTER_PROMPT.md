@@ -1,5 +1,7 @@
 # Codex master brief — Taleed Talent & Team Development SPA
 
+> **Historical prototype brief.** Its browser-only/no-backend directions are superseded by the repository-root production conversion instructions. Retain this file only as historical UX and flow context; do not execute it as the current implementation contract.
+
 **Owner:** Fadi Zahhar  
 **Prepared:** 15 September 2026  
 **Goal:** Build, validate and hand over a complete high-fidelity React/Redux browser prototype. This is not a request for a plan-only answer or a production backend.

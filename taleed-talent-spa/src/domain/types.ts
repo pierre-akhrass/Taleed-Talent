@@ -5,7 +5,7 @@ export type Theme = typeof themes[number];
 export type Scope = typeof scopes[number];
 export type Dimension = typeof dimensions[number];
 export type Role = 'leader' | 'champion' | 'taleed' | 'admin';
-export type OccurrenceStatus = 'scheduled' | 'in_progress' | 'blocked' | 'completed' | 'cancelled';
+export type OccurrenceStatus = 'scheduled' | 'in_progress' | 'blocked' | 'completed' | 'cancelled' | 'superseded';
 export interface User {
     id: string;
     name: string;

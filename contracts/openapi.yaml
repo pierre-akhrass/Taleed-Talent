@@ -2,7 +2,10 @@ openapi: 3.1.0
 info:
   title: Taleed Talent Application API
   version: 1.0.0
-  description: Local Phase 2 identity and session contract. Business domain endpoints are added in later phases.
+  description: >-
+    Frozen v1 identity and Talent-domain contract. Identity/session and invitation
+    endpoints are implemented in the local application. Talent-domain operations
+    are contracted here for Phase 3 implementation and are not yet registered as routes.
 servers:
   - url: https://talent.taleed.test:9443
 security:
@@ -121,6 +124,513 @@ paths:
           description: Invitation is expired, revoked, or already consumed.
         '419':
           $ref: '#/components/responses/CsrfExpired'
+  /api/v1/activities:
+    get:
+      operationId: listActivities
+      parameters:
+        - $ref: '#/components/parameters/OrganizationIdQuery'
+        - name: theme
+          in: query
+          schema:
+            $ref: '#/components/schemas/Theme'
+        - name: scope
+          in: query
+          schema:
+            $ref: '#/components/schemas/Scope'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 512
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: Published source activities and the caller's authorized custom Develop activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityCollectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /api/v1/activities/{activityId}:
+    get:
+      operationId: getActivity
+      parameters:
+        - $ref: '#/components/parameters/ActivityId'
+        - $ref: '#/components/parameters/OrganizationIdQuery'
+      responses:
+        '200':
+          description: One visible activity with its pinned current version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+        '404':
+          description: Activity is unknown, retired, or outside the caller's visibility.
+  /api/v1/custom-activities:
+    post:
+      operationId: createCustomDevelopActivity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomActivityRequest'
+      responses:
+        '201':
+          description: Owner-private Develop activity and immutable version created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+        '404':
+          description: Organization is unknown or outside the caller's membership.
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/custom-activities/{activityId}:
+    parameters:
+      - $ref: '#/components/parameters/ActivityId'
+    patch:
+      operationId: versionCustomDevelopActivity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomActivityUpdateRequest'
+      responses:
+        '200':
+          description: New immutable version created for the owner-authored Develop activity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+        '404':
+          description: Activity is unknown or outside the caller's ownership.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/custom-activities/{activityId}/retire:
+    post:
+      operationId: retireCustomDevelopActivity
+      parameters:
+        - $ref: '#/components/parameters/ActivityId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpectedActivityVersionRequest'
+      responses:
+        '200':
+          description: Owner-private activity retired without changing historical versions.
+        '404':
+          description: Activity is unknown or outside the caller's ownership.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+  /api/v1/bookmarks:
+    get:
+      operationId: listBookmarks
+      parameters:
+        - $ref: '#/components/parameters/OrganizationIdQuery'
+      responses:
+        '200':
+          description: Caller-owned bookmarks for currently visible activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkCollectionResponse'
+        '404':
+          description: Organization is unknown or outside the caller's membership.
+  /api/v1/activities/{activityId}/bookmark:
+    parameters:
+      - $ref: '#/components/parameters/ActivityId'
+      - $ref: '#/components/parameters/OrganizationIdQuery'
+    put:
+      operationId: bookmarkActivity
+      responses:
+        '200':
+          description: Bookmark created idempotently for a visible activity.
+        '404':
+          description: Activity is unknown or outside the caller's visibility.
+    delete:
+      operationId: removeActivityBookmark
+      responses:
+        '204':
+          description: Caller-owned bookmark removed.
+        '404':
+          description: Bookmark is unknown or outside the caller's visibility.
+  /api/v1/plan-drafts:
+    get:
+      operationId: listPlanDrafts
+      parameters:
+        - $ref: '#/components/parameters/OrganizationIdQuery'
+        - $ref: '#/components/parameters/Month'
+      responses:
+        '200':
+          description: The authenticated Leader's drafts for the requested month.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanDraftCollectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      operationId: createPlanDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanDraftRequest'
+      responses:
+        '201':
+          description: Draft created for the authenticated Leader in the selected organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanDraftResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/plan-drafts/{draftId}:
+    parameters:
+      - $ref: '#/components/parameters/DraftId'
+    get:
+      operationId: getPlanDraft
+      responses:
+        '200':
+          description: Owner-scoped plan draft.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanDraftResponse'
+        '404':
+          description: Draft is unknown or outside the caller's visibility.
+    patch:
+      operationId: updatePlanDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanDraftUpdateRequest'
+      responses:
+        '200':
+          description: Draft saved with an incremented lock version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanDraftResponse'
+        '404':
+          description: Draft is unknown or outside the caller's visibility.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/plan-drafts/{draftId}/activate:
+    post:
+      operationId: activatePlanDraft
+      parameters:
+        - $ref: '#/components/parameters/DraftId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpectedVersionRequest'
+      responses:
+        '201':
+          description: A valid one-theme, three-scope plan was activated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanResponse'
+        '404':
+          description: Draft is unknown or outside the caller's visibility.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/plans:
+    get:
+      operationId: listPlans
+      parameters:
+        - $ref: '#/components/parameters/OrganizationIdQuery'
+        - $ref: '#/components/parameters/Month'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 512
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: Owner-scoped plans for the requested month.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanCollectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /api/v1/plans/{planId}:
+    get:
+      operationId: getPlan
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+      responses:
+        '200':
+          description: Owner-scoped plan and pinned commitments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanResponse'
+        '404':
+          description: Plan is unknown or outside the caller's visibility.
+  /api/v1/plans/{planId}/commitments:
+    post:
+      operationId: addCustomDevelopCommitment
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCommitmentRequest'
+      responses:
+        '201':
+          description: Owner-authored custom Develop activity pinned to a Develop plan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitmentResponse'
+        '404':
+          description: Plan or activity is unknown or outside the caller's visibility.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/plans/{planId}/close:
+    post:
+      operationId: closePlan
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClosePlanRequest'
+      responses:
+        '200':
+          description: Immutable closure revision created; safe report publication follows the configured sharing gate.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClosureResponse'
+        '404':
+          description: Plan is unknown or outside the caller's visibility.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/plans/{planId}/reopen:
+    post:
+      operationId: reopenPlan
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpectedVersionRequest'
+      responses:
+        '200':
+          description: Working revision incremented; all earlier closure revisions remain immutable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanReopenResponse'
+        '404':
+          description: Plan is unknown or outside the caller's visibility.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+  /api/v1/plans/{planId}/closures:
+    get:
+      operationId: listPlanClosures
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+      responses:
+        '200':
+          description: Owner-only immutable closure history; private payload is not included.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClosureCollectionResponse'
+        '404':
+          description: Plan is unknown or outside the caller's visibility.
+  /api/v1/commitments/{commitmentId}/schedule-versions:
+    post:
+      operationId: createScheduleVersion
+      parameters:
+        - $ref: '#/components/parameters/CommitmentId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleVersionRequest'
+      responses:
+        '201':
+          description: Immutable schedule version created; past/completed/cancelled history is retained and eligible future work is replaced using superseded occurrence events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleVersionResponse'
+        '404':
+          description: Commitment is unknown or outside the caller's visibility.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/calendar:
+    get:
+      operationId: getCalendar
+      parameters:
+        - $ref: '#/components/parameters/OrganizationIdQuery'
+        - $ref: '#/components/parameters/Month'
+      responses:
+        '200':
+          description: Owner-scoped occurrence agenda and calendar for one business month.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OccurrenceCollectionResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/occurrences/{occurrenceId}:
+    patch:
+      operationId: updateOccurrenceStatus
+      parameters:
+        - $ref: '#/components/parameters/OccurrenceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OccurrenceStatusRequest'
+      responses:
+        '200':
+          description: Occurrence transition recorded with immutable identity preserved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OccurrenceResponse'
+        '404':
+          description: Occurrence is unknown or outside the caller's visibility.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/occurrences/{occurrenceId}/reschedule:
+    post:
+      operationId: rescheduleOccurrence
+      parameters:
+        - $ref: '#/components/parameters/OccurrenceId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OccurrenceRescheduleRequest'
+      responses:
+        '200':
+          description: Current date changed while original occurrence identity and event history remain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OccurrenceResponse'
+        '404':
+          description: Occurrence is unknown or outside the caller's visibility.
+        '409':
+          description: Stale version or active-date collision.
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/occurrences/{occurrenceId}/note:
+    put:
+      operationId: saveOccurrencePrivateNote
+      parameters:
+        - $ref: '#/components/parameters/OccurrenceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OccurrenceNoteRequest'
+      responses:
+        '200':
+          description: Owner-private note encrypted at rest and excluded from reports and event history.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OccurrenceResponse'
+        '404':
+          description: Occurrence is unknown or outside the caller's ownership.
+        '409':
+          $ref: '#/components/responses/VersionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/portfolio/reports:
+    get:
+      operationId: listAssignedOrganizationReports
+      parameters:
+        - $ref: '#/components/parameters/Month'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 512
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: Frozen allowlisted reports for organizations assigned to the authenticated Taleed user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonthlyReportCollectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Organization sharing is disabled or no assigned report is visible.
 components:
   securitySchemes:
     laravelSession:
@@ -135,7 +645,692 @@ components:
       schema:
         type: string
         pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+    OrganizationIdQuery:
+      name: organizationId
+      in: query
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ulid'
+    ActivityId:
+      name: activityId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ulid'
+    DraftId:
+      name: draftId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ulid'
+    PlanId:
+      name: planId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ulid'
+    CommitmentId:
+      name: commitmentId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ulid'
+    OccurrenceId:
+      name: occurrenceId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ulid'
+    Month:
+      name: month
+      in: query
+      required: true
+      schema:
+        type: string
+        pattern: '^\\d{4}-(0[1-9]|1[0-2])$'
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 128
   schemas:
+    Ulid:
+      type: string
+      pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+    Theme:
+      type: string
+      enum: [care, develop, enable, recognition]
+    Scope:
+      type: string
+      enum: [individual, culture, team]
+    OccurrenceStatus:
+      type: string
+      enum: [scheduled, completed, blocked, in_progress, cancelled, superseded]
+    PlanDraftRequest:
+      type: object
+      additionalProperties: false
+      required: [organizationId, month]
+      properties:
+        organizationId:
+          $ref: '#/components/schemas/Ulid'
+        month:
+          type: string
+          pattern: '^\\d{4}-(0[1-9]|1[0-2])$'
+        title:
+          type: string
+          maxLength: 100
+        selectedTheme:
+          $ref: '#/components/schemas/Theme'
+        step:
+          type: string
+          maxLength: 40
+    PlanDraftUpdateRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        selectedTheme:
+          $ref: '#/components/schemas/Theme'
+        selectedActivityIds:
+          type: array
+          minItems: 0
+          maxItems: 3
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Ulid'
+        title:
+          type: string
+          maxLength: 100
+        step:
+          type: string
+          maxLength: 40
+    ExpectedVersionRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+    ScheduleVersionRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, cadence, startDate, endDate]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        cadence:
+          type: string
+          enum: [daily, weekly, one_off]
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        weekdays:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 7
+          items:
+            type: integer
+            minimum: 0
+            maximum: 6
+    OccurrenceStatusRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, status]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        status:
+          $ref: '#/components/schemas/OccurrenceStatus'
+    OccurrenceRescheduleRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, scheduledDate]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        scheduledDate:
+          type: string
+          format: date
+    OccurrenceNoteRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, note]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        note:
+          type: string
+          maxLength: 4000
+          writeOnly: true
+          description: Owner-private note; encrypted at rest and never included in shared reports.
+    ClosePlanRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        incompleteExplanation:
+          type: string
+          maxLength: 4000
+          writeOnly: true
+          description: Owner-private text; never included in the closure's safe facts or shared report.
+    ActivityVersion:
+      type: object
+      required: [id, version, theme, scope, title, description]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        version:
+          type: integer
+          minimum: 1
+        theme:
+          $ref: '#/components/schemas/Theme'
+        scope:
+          $ref: '#/components/schemas/Scope'
+        title:
+          type: string
+        description:
+          type: string
+        steps:
+          type: array
+          items:
+            type: string
+    ActivityResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, kind, currentVersion]
+          properties:
+            id:
+              $ref: '#/components/schemas/Ulid'
+            kind:
+              type: string
+              enum: [source, custom]
+            currentVersion:
+              $ref: '#/components/schemas/ActivityVersion'
+    ActivityCollectionResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityResponse/properties/data'
+        meta:
+          $ref: '#/components/schemas/CursorMeta'
+    CustomActivityRequest:
+      type: object
+      additionalProperties: false
+      required: [organizationId, scope, title, description]
+      properties:
+        organizationId:
+          $ref: '#/components/schemas/Ulid'
+        scope:
+          $ref: '#/components/schemas/Scope'
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 4000
+        steps:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+            maxLength: 500
+    CustomActivityUpdateRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 1
+        scope:
+          $ref: '#/components/schemas/Scope'
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 4000
+        steps:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+            maxLength: 500
+    ExpectedActivityVersionRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 1
+    BookmarkCollectionResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ActivityResponse/properties/data'
+              - type: object
+                required: [bookmarkedAt]
+                properties:
+                  bookmarkedAt:
+                    type: string
+                    format: date-time
+    PlanDraft:
+      type: object
+      required: [id, organizationId, month, title, selectedActivityIds, step, lockVersion]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        organizationId:
+          $ref: '#/components/schemas/Ulid'
+        month:
+          type: string
+          pattern: '^\\d{4}-(0[1-9]|1[0-2])$'
+        title:
+          type: string
+          maxLength: 100
+        selectedTheme:
+          oneOf:
+            - $ref: '#/components/schemas/Theme'
+            - type: 'null'
+        selectedActivityIds:
+          type: array
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/Ulid'
+        step:
+          type: string
+        lockVersion:
+          type: integer
+          minimum: 0
+    PlanDraftResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/PlanDraft'
+    PlanDraftCollectionResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanDraft'
+    Plan:
+      type: object
+      required: [id, organizationId, month, timezone, focusTheme, status, workingRevision, lockVersion, metrics, commitments]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        organizationId:
+          $ref: '#/components/schemas/Ulid'
+        month:
+          type: string
+          pattern: '^\\d{4}-(0[1-9]|1[0-2])$'
+        timezone:
+          type: string
+          default: Asia/Riyadh
+        title:
+          type: string
+          nullable: true
+        focusTheme:
+          $ref: '#/components/schemas/Theme'
+        status:
+          type: string
+          enum: [active, closed]
+        workingRevision:
+          type: integer
+          minimum: 1
+        lockVersion:
+          type: integer
+          minimum: 0
+        metrics:
+          $ref: '#/components/schemas/PlanMetrics'
+        commitments:
+          type: array
+          items:
+            type: object
+            required: [id, activityVersionId, theme, scope]
+            properties:
+              id:
+                $ref: '#/components/schemas/Ulid'
+              activityVersionId:
+                $ref: '#/components/schemas/Ulid'
+              theme:
+                $ref: '#/components/schemas/Theme'
+              scope:
+                $ref: '#/components/schemas/Scope'
+    PlanMetrics:
+      type: object
+      required: [scheduled, completed, blocked, inProgress, cancelled, eligible, rate, coverage]
+      properties:
+        scheduled: { type: integer, minimum: 0 }
+        completed: { type: integer, minimum: 0 }
+        blocked: { type: integer, minimum: 0 }
+        inProgress: { type: integer, minimum: 0 }
+        cancelled: { type: integer, minimum: 0 }
+        eligible: { type: integer, minimum: 0 }
+        rate:
+          type: integer
+          minimum: 0
+          maximum: 100
+          nullable: true
+        coverage:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Scope'
+    PlanResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Plan'
+    AddCommitmentRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, activityId]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        activityId:
+          $ref: '#/components/schemas/Ulid'
+    CommitmentResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, activityVersionId, theme, scope]
+          properties:
+            id:
+              $ref: '#/components/schemas/Ulid'
+            activityVersionId:
+              $ref: '#/components/schemas/Ulid'
+            theme:
+              $ref: '#/components/schemas/Theme'
+            scope:
+              $ref: '#/components/schemas/Scope'
+    PlanReopenResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, status, workingRevision, lockVersion]
+          properties:
+            id:
+              $ref: '#/components/schemas/Ulid'
+            status:
+              type: string
+              const: active
+            workingRevision:
+              type: integer
+              minimum: 1
+            lockVersion:
+              type: integer
+              minimum: 0
+    PlanCollectionResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+        meta:
+          $ref: '#/components/schemas/CursorMeta'
+    Occurrence:
+      type: object
+      required: [id, planId, commitmentId, generationDate, scheduledDate, status, lockVersion, note]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        planId:
+          $ref: '#/components/schemas/Ulid'
+        commitmentId:
+          $ref: '#/components/schemas/Ulid'
+        generationDate:
+          type: string
+          format: date
+          description: Immutable generation identity, unchanged by rescheduling.
+        scheduledDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/OccurrenceStatus'
+        lockVersion:
+          type: integer
+          minimum: 0
+        note:
+          type: string
+          maxLength: 4000
+          description: Owner-private note; never included in organization reports.
+    OccurrenceCollectionResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Occurrence'
+    OccurrenceResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Occurrence'
+    ScheduleVersionResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, commitmentId, version, cadence, startDate, endDate, weekdays]
+          properties:
+            id:
+              $ref: '#/components/schemas/Ulid'
+            commitmentId:
+              $ref: '#/components/schemas/Ulid'
+            version:
+              type: integer
+              minimum: 1
+            cadence:
+              type: string
+              enum: [daily, weekly, one_off]
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+            weekdays:
+              type: array
+              items:
+                type: integer
+                minimum: 0
+                maximum: 6
+    ClosureResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, planId, revision, closedAt, metrics]
+          properties:
+            id:
+              $ref: '#/components/schemas/Ulid'
+            planId:
+              $ref: '#/components/schemas/Ulid'
+            revision:
+              type: integer
+              minimum: 1
+            closedAt:
+              type: string
+              format: date-time
+            metrics:
+              type: object
+              required: [scheduled, completed, blocked, inProgress, cancelled, eligible, completionRate, coverage]
+              properties:
+                scheduled: { type: integer, minimum: 0 }
+                completed: { type: integer, minimum: 0 }
+                blocked: { type: integer, minimum: 0 }
+                inProgress: { type: integer, minimum: 0 }
+                cancelled: { type: integer, minimum: 0 }
+                eligible: { type: integer, minimum: 0 }
+                completionRate:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                  nullable: true
+                coverage:
+                  type: array
+                  uniqueItems: true
+                  items:
+                    $ref: '#/components/schemas/Scope'
+    ClosureCollectionResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClosureResponse/properties/data'
+    CursorMeta:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+    MonthlyReport:
+      type: object
+      required: [organizationId, organizationName, month, participatingLeaders, closedPlans, activityCounts, scopeCounts, scheduled, completed, blocked, inProgress, cancelled, eligible, coverage, fullyCoveredDevelopmentPlans, version, sharedAt]
+      properties:
+        organizationId:
+          $ref: '#/components/schemas/Ulid'
+        organizationName:
+          type: string
+        month:
+          type: string
+          pattern: '^\\d{4}-(0[1-9]|1[0-2])$'
+        participatingLeaders:
+          type: integer
+          minimum: 0
+          description: Aggregate count only; no participant identities or private-feature participation signals.
+        closedPlans:
+          type: integer
+          minimum: 0
+        activityCounts:
+          type: object
+          additionalProperties: false
+          required: [care, develop, enable, recognition]
+          properties:
+            care: { type: integer, minimum: 0 }
+            develop: { type: integer, minimum: 0 }
+            enable: { type: integer, minimum: 0 }
+            recognition: { type: integer, minimum: 0 }
+        scopeCounts:
+          type: object
+          additionalProperties: false
+          required: [individual, culture, team]
+          properties:
+            individual: { type: integer, minimum: 0 }
+            culture: { type: integer, minimum: 0 }
+            team: { type: integer, minimum: 0 }
+        scheduled: { type: integer, minimum: 0 }
+        completed: { type: integer, minimum: 0 }
+        blocked: { type: integer, minimum: 0 }
+        inProgress: { type: integer, minimum: 0 }
+        cancelled: { type: integer, minimum: 0 }
+        eligible: { type: integer, minimum: 0 }
+        coverage:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Scope'
+        fullyCoveredDevelopmentPlans: { type: integer, minimum: 0 }
+        version: { type: integer, minimum: 1 }
+        sharedAt:
+          type: string
+          format: date-time
+    MonthlyReportCollectionResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonthlyReport'
+        meta:
+          $ref: '#/components/schemas/CursorMeta'
+    ConflictResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, requestId, currentVersion]
+          properties:
+            code:
+              type: string
+              const: version_conflict
+            message:
+              type: string
+            requestId:
+              type: string
+            currentVersion:
+              type: integer
+              minimum: 0
+    ApiErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, requestId]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            requestId:
+              type: string
+            fields:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
     LoginRequest:
       type: object
       required: [email, password]
@@ -214,5 +1409,15 @@ components:
       description: CSRF token is missing or expired.
     ValidationError:
       description: Request validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
     RateLimited:
       description: Too many requests.
+    VersionConflict:
+      description: The expected lock version is stale; no write was applied.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictResponse'

@@ -66,14 +66,21 @@ export function starterErrors(d: Draft, catalogue: Record<string, Activity>): st
     if (!validMonth(d.month))
         errors.push('Choose a valid month.');
     const selected = scopes.map(scope => catalogue[d.selected[scope]]);
-    if (selected.some((a, i) => !a || a.scope !== scopes[i] || a.theme !== d.theme || a.status !== 'available'))
+    if (!validPickThree(d.theme, selected))
         errors.push('Choose one available activity per scope, all in the same focus theme.');
     if (new Set(scopes.map(scope => d.selected[scope])).size !== 3)
         errors.push('Your three starter activities must be different.');
     return errors;
 }
+export function validPickThree(theme: string, activities: Array<{ theme: string; scope: string; status: string } | undefined>): boolean {
+    const selected = activities.filter((activity): activity is { theme: string; scope: string; status: string } => activity !== undefined);
+    return selected.length === 3
+        && selected.every(activity => activity.theme === theme && activity.status === 'available')
+        && new Set(selected.map(activity => activity.scope)).size === 3
+        && scopes.every(scope => selected.some(activity => activity.scope === scope));
+}
 export function planMetrics(plan: Plan, occurrences: Occurrence[]): Metrics {
-    const own = occurrences.filter(o => o.planId === plan.id), eligible = own.filter(o => o.status !== 'cancelled'), completed = eligible.filter(o => o.status === 'completed');
+    const own = occurrences.filter(o => o.planId === plan.id && o.status !== 'superseded'), eligible = own.filter(o => o.status !== 'cancelled'), completed = eligible.filter(o => o.status === 'completed');
     const ids = new Set(completed.map(o => o.commitmentId));
     const coverage = scopes.filter(scope => plan.items.some(c => ids.has(c.id) && c.activity.scope === scope));
     return { scheduled: own.length, completed: completed.length, blocked: own.filter(o => o.status === 'blocked').length, inProgress: own.filter(o => o.status === 'in_progress').length, cancelled: own.filter(o => o.status === 'cancelled').length, eligible: eligible.length, rate: eligible.length ? Math.round(completed.length / eligible.length * 100) : null, coverage };

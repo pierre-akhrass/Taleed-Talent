@@ -1,0 +1,18 @@
+{
+    "agents": [
+        "claude_code",
+        "copilot"
+    ],
+    "cloud": false,
+    "guidelines": true,
+    "packages": [
+        "statamic/cms"
+    ],
+    "skills": [
+        "infer-conventions",
+        "fortify-development",
+        "laravel-best-practices",
+        "testing-best-practices",
+        "tailwindcss-development"
+    ]
+}

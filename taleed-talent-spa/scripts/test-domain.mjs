@@ -1,10 +1,12 @@
 /** Runs the actual pure domain modules without React, Redux or a DOM. */
-import assert from 'node:assert/strict';import fs from 'node:fs';import path from 'node:path';import vm from 'node:vm';import {fileURLToPath} from 'node:url';import {webcrypto} from 'node:crypto';
-import {loadTypeScript} from './typescript-runtime.mjs';
-const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),ts=loadTypeScript(),cache=new Map();
-function load(file){file=path.resolve(file);if(cache.has(file))return cache.get(file).exports;const mod={exports:{}};cache.set(file,mod);const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;const require=ref=>{if(!ref.startsWith('.'))throw new Error(`External dependency not allowed in pure tests: ${ref}`);return load(path.resolve(path.dirname(file),ref+'.ts'));};const wrapper=vm.runInThisContext(`(function(require,module,exports){${code}\n})`,{filename:file});wrapper(require,mod,mod.exports);return mod.exports;}
+import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';import {webcrypto} from 'node:crypto';import {createRequire} from 'node:module';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import {fileURLToPath} from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),tempDir=fs.mkdtempSync(path.join(os.tmpdir(),'taleed-domain-')),sourceRoot=path.join(tempDir,'src'),compiledRoot=path.join(tempDir,'compiled'),require=createRequire(import.meta.url),tsVersion=require('typescript/package.json').version;
+fs.cpSync(path.join(root,'src'),sourceRoot,{recursive:true});
+fs.writeFileSync(path.join(tempDir,'package.json'),JSON.stringify({type:'commonjs'}));
+execFileSync(process.execPath,[path.join(root,'node_modules/typescript/bin/tsc'),'--ignoreConfig','--target','ES2022','--module','NodeNext','--moduleResolution','NodeNext','--rootDir',sourceRoot,'--outDir',compiledRoot,'--skipLibCheck','--esModuleInterop','--types','node',path.join(sourceRoot,'domain/logic.ts'),path.join(sourceRoot,'domain/types.ts'),path.join(sourceRoot,'data/seed.ts')],{cwd:root,stdio:'inherit'});
+const requireCompiled=createRequire(path.join(compiledRoot,'entry.cjs'));
 globalThis.crypto??=webcrypto;
-const L=load(path.join(root,'src/domain/logic.ts')),T=load(path.join(root,'src/domain/types.ts')),{makeSeed}=load(path.join(root,'src/data/seed.ts'));
+const L=requireCompiled('./domain/logic.js'),T=requireCompiled('./domain/types.js'),{makeSeed}=requireCompiled('./data/seed.js');
 const results=[];function test(name,fn){try{fn();results.push({name,status:'PASS'});}catch(e){results.push({name,status:'FAIL',message:e.message});}}
 const seed=makeSeed(),past=seed.planning.snapshots['snapshot-seed'];
 const sample={id:'test',ownerId:'leader-a',month:'2026-09',scores:L.emptyScores(),focus:'',actions:['','',''],status:'draft',revision:1,updatedAt:'2026-09-15T12:00:00Z'};
@@ -51,5 +53,6 @@ test('Complete reflection requires explicit focus and three actions',()=>{const 
 test('Published-content edits cannot mutate a plan copy',()=>{const s=makeSeed();s.catalogue.activities['develop-individual-1'].title='A changed title';assert.notEqual(s.planning.plans['plan-current'].items[0].activity.title,'A changed title');});
 test('CSV neutralizes formula-leading characters and escapes quotes',()=>{assert.equal(L.csvCell('=1+1'),'"\'=1+1"');assert.equal(L.csvCell('a"b'),'"a""b"');});
 test('Calendar export excludes cancelled/private notes',()=>{const text=L.calendarFile(past.plan,past.occurrences);assert.equal((text.match(/BEGIN:VEVENT/g)||[]).length,4);assert.equal(text.includes('Synthetic private note'),false);assert.ok(text.includes('DTSTART;VALUE=DATE:20260805'));});
-const report={checkedAt:new Date().toISOString(),node:process.versions.node,typescript:ts.version,passed:results.filter(r=>r.status==='PASS').length,failed:results.filter(r=>r.status==='FAIL').length,scope:'Executed pure domain functions and synthetic seed only. React, Redux, Zod, browser interactions and dependency integration are NOT covered by this run.',results};
+const report={checkedAt:new Date().toISOString(),node:process.versions.node,typescript:tsVersion,passed:results.filter(r=>r.status==='PASS').length,failed:results.filter(r=>r.status==='FAIL').length,scope:'Executed pure domain functions and synthetic seed only. React, Redux, Zod, browser interactions and dependency integration are NOT covered by this run.',results};
+fs.rmSync(tempDir,{recursive:true,force:true});
 fs.mkdirSync(path.join(root,'docs'),{recursive:true});fs.writeFileSync(path.join(root,'docs/domain-test-results.json'),JSON.stringify(report,null,2)+'\n');for(const r of results)console.log(`${r.status} ${r.name}${r.message?' — '+r.message:''}`);console.log(`\n${report.passed} passed; ${report.failed} failed`);if(report.failed)process.exitCode=1;

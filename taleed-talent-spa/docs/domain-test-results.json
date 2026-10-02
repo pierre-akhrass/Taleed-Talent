@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-09-15T09:59:41.522Z",
-  "node": "22.16.0",
-  "typescript": "5.8.3",
+  "checkedAt": "2026-10-02T12:37:33.554Z",
+  "node": "24.10.0",
+  "typescript": "7.0.2",
   "passed": 41,
   "failed": 0,
   "scope": "Executed pure domain functions and synthetic seed only. React, Redux, Zod, browser interactions and dependency integration are NOT covered by this run.",

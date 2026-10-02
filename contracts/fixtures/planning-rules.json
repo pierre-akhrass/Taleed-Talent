@@ -1,0 +1,115 @@
+{
+  "pickThree": [
+    {
+      "name": "one available activity per scope in one theme",
+      "theme": "care",
+      "activities": [
+        { "theme": "care", "scope": "individual", "available": true },
+        { "theme": "care", "scope": "culture", "available": true },
+        { "theme": "care", "scope": "team", "available": true }
+      ],
+      "valid": true
+    },
+    {
+      "name": "mixed themes are rejected",
+      "theme": "care",
+      "activities": [
+        { "theme": "care", "scope": "individual", "available": true },
+        { "theme": "care", "scope": "culture", "available": true },
+        { "theme": "develop", "scope": "team", "available": true }
+      ],
+      "valid": false
+    },
+    {
+      "name": "duplicate scopes are rejected",
+      "theme": "care",
+      "activities": [
+        { "theme": "care", "scope": "individual", "available": true },
+        { "theme": "care", "scope": "individual", "available": true },
+        { "theme": "care", "scope": "team", "available": true }
+      ],
+      "valid": false
+    },
+    {
+      "name": "unavailable activities are rejected",
+      "theme": "care",
+      "activities": [
+        { "theme": "care", "scope": "individual", "available": true },
+        { "theme": "care", "scope": "culture", "available": false },
+        { "theme": "care", "scope": "team", "available": true }
+      ],
+      "valid": false
+    },
+    {
+      "name": "two activities are rejected",
+      "theme": "care",
+      "activities": [
+        { "theme": "care", "scope": "individual", "available": true },
+        { "theme": "care", "scope": "culture", "available": true }
+      ],
+      "valid": false
+    }
+  ],
+  "schedules": [
+    {
+      "name": "daily includes each date",
+      "theme": "care",
+      "cadence": "daily",
+      "startDate": "2026-10-01",
+      "endDate": "2026-10-03",
+      "weekdays": [],
+      "dates": ["2026-10-01", "2026-10-02", "2026-10-03"]
+    },
+    {
+      "name": "weekly uses selected weekdays",
+      "theme": "develop",
+      "cadence": "weekly",
+      "startDate": "2026-10-01",
+      "endDate": "2026-10-12",
+      "weekdays": [1, 3],
+      "dates": ["2026-10-05", "2026-10-07", "2026-10-12"]
+    },
+    {
+      "name": "one-off Develop is a single date",
+      "theme": "develop",
+      "cadence": "one_off",
+      "startDate": "2026-10-15",
+      "endDate": "2026-10-15",
+      "weekdays": [],
+      "dates": ["2026-10-15"]
+    },
+    {
+      "name": "one-off outside Develop is rejected",
+      "theme": "care",
+      "cadence": "one_off",
+      "startDate": "2026-10-15",
+      "endDate": "2026-10-15",
+      "weekdays": [],
+      "dates": null
+    }
+  ],
+  "metrics": {
+    "commitments": [
+      { "id": "commitment-individual", "scope": "individual" },
+      { "id": "commitment-culture", "scope": "culture" },
+      { "id": "commitment-team", "scope": "team" }
+    ],
+    "occurrences": [
+      { "commitmentId": "commitment-individual", "status": "completed" },
+      { "commitmentId": "commitment-team", "status": "completed" },
+      { "commitmentId": "commitment-culture", "status": "blocked" },
+      { "commitmentId": "commitment-team", "status": "cancelled" },
+      { "commitmentId": "commitment-individual", "status": "superseded" }
+    ],
+    "expected": {
+      "scheduled": 4,
+      "completed": 2,
+      "blocked": 1,
+      "inProgress": 0,
+      "cancelled": 1,
+      "eligible": 3,
+      "rate": 67,
+      "coverage": ["individual", "team"]
+    }
+  }
+}

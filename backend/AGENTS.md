@@ -1,47 +1,264 @@
 <laravel-boost-guidelines>
-# Laravel Application
+=== foundation rules ===
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+# Laravel Boost Guidelines
 
-## Prerequisites
+## Foundational Context
 
-Verify that PHP and Composer are available:
+This application is a Laravel application running on PHP 8.4. Always use the APIs that match the installed major version of each package — do not assume a version.
 
-```sh
-php -v
-composer -V
-```
+Before relying on a package's API, confirm its installed version:
+- PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
+- JS packages: check `package.json` for the installed versions.
 
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
+## Skills Activation
 
-macOS:
+This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
+## Conventions
 
-Windows PowerShell:
+- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
+- Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
+- Check for existing components to reuse before writing a new one.
 
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
+## Verification Scripts
 
-Linux:
+- Do not create verification scripts or tinker when tests cover that functionality and prove they work. Unit and feature tests are more important.
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
+## Application Structure & Architecture
 
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
+- Stick to existing directory structure; don't create new base folders without approval.
+- Do not change the application's dependencies without approval.
 
-## Agent Setup
+## Frontend Bundling
 
-Install Laravel Boost from the application root before making application changes:
+- If a frontend change doesn't show in the UI or you get a "Unable to locate file in Vite manifest" error, run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
 
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
+## Documentation Files
 
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
+- You must only create documentation files if explicitly requested by the user.
+
+=== boost rules ===
+
+# Laravel Boost
+
+## Project Rules
+
+- This project contains committed, area-grouped rules in `.ai/rules` when that directory exists, including path-scoped framework guidelines under `.ai/rules/boost`. Before you enter plan mode or create/edit any file, you MUST first: open @.ai/rules/index.md (it maps file globs to rule files), read every rule file whose globs cover the path(s) in scope, and run `grep -rin 'keyword' .ai/rules` to catch what a path match alone misses. Do not write code until you have read and are following every matching rule. If `.ai/rules` does not exist, continue without it.
+
+## Artisan
+
+- Run Artisan commands directly via the command line (e.g., `php artisan route:list`). Use `php artisan list` to discover available commands and `php artisan [command] --help` to check parameters.
+- Inspect routes with `php artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
+- Read configuration values using dot notation: `php artisan config:show app.name`, `php artisan config:show database.default`. Or read config files directly from the `config/` directory.
+
+## Tinker
+
+- Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
+- Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
+  - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
+
+=== php rules ===
+
+# PHP
+
+- Always use curly braces for control structures, even for single-line bodies.
+- Use PHP 8 constructor property promotion: `public function __construct(public GitHub $github) { }`. Do not leave empty zero-parameter `__construct()` methods unless the constructor is private.
+- Use explicit return type declarations and type hints for all method parameters: `function isAccessible(User $user, ?string $path = null): bool`
+- Use TitleCase for Enum keys: `FavoritePerson`, `BestLake`, `Monthly`.
+- Prefer PHPDoc blocks over inline comments. Only add inline comments for exceptionally complex logic.
+- Use array shape type definitions in PHPDoc blocks.
+
+=== deployments rules ===
+
+# Deployment
+
+- Deployment must follow the repository-root `AGENTS.md` and `docs/production/OPERATIONS.md`. Do not substitute Laravel Cloud or another hosting target for the approved GCP VM architecture.
+
+=== tests rules ===
+
+# Test Enforcement
+
+- Add or update tests for behavior and logic changes when a test provides meaningful regression coverage.
+- Pure copy, styling, and layout-only changes do not require new or updated tests.
+- When test coverage applies, run the affected tests and ensure they pass.
+- Test the changed behavior and its important failure modes, but do not add tests beyond them.
+- Read the `testing-best-practices` skill before writing tests.
+
+=== inertia-laravel/core rules ===
+
+# Inertia
+
+- Inertia creates fully client-side rendered SPAs without modern SPA complexity, leveraging existing server-side patterns.
+- Components live in `resources/js/Pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
+- ALWAYS use `search-docs` tool for version-specific Inertia documentation and updated code examples.
+
+# Inertia v3
+
+- Use all Inertia features from v1, v2, and v3. Check the documentation before making changes to ensure the correct approach.
+- New v3 features: standalone HTTP requests (`useHttp` hook), optimistic updates with automatic rollback, layout props (`useLayoutProps` hook), instant visits, simplified SSR via `@inertiajs/vite` plugin, custom exception handling for error pages.
+- Carried over from v2: deferred props, infinite scroll, merging props, polling, prefetching, once props, flash data.
+- When using deferred props, add an empty state with a pulsing or animated skeleton.
+- Axios has been removed. Use the built-in XHR client with interceptors, or install Axios separately if needed.
+- `Inertia::lazy()` / `LazyProp` has been removed. Use `Inertia::optional()` instead.
+- Prop types (`Inertia::optional()`, `Inertia::defer()`, `Inertia::merge()`) work inside nested arrays with dot-notation paths.
+- SSR works automatically in Vite dev mode with `@inertiajs/vite` - no separate Node.js server needed during development.
+- Event renames: `invalid` is now `httpException`, `exception` is now `networkError`.
+- `router.cancel()` replaced by `router.cancelAll()`.
+- The `future` configuration namespace has been removed - all v2 future options are now always enabled.
+
+=== laravel/core rules ===
+
+# Do Things the Laravel Way
+
+- Use `php artisan make:` commands to create new files (i.e. migrations, controllers, models, etc.). You can list available Artisan commands using `php artisan list` and check their parameters with `php artisan [command] --help`.
+- If you're creating a generic PHP class, use `php artisan make:class`.
+- Pass `--no-interaction` to all Artisan commands to ensure they work without user input. You should also pass the correct `--options` to ensure correct behavior.
+
+### Model Creation
+
+- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `php artisan make:model --help` to check the available options.
+
+## APIs & Eloquent Resources
+
+- For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.
+
+## URL Generation
+
+- When generating links to other pages, prefer named routes and the `route()` function.
+
+## Testing
+
+- When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
+- Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
+- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
+
+=== pint/core rules ===
+
+# Laravel Pint Code Formatter
+
+- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
+- Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
+
+=== phpunit/core rules ===
+
+# PHPUnit
+
+- This project uses PHPUnit. Create tests with `php artisan make:test --phpunit {name}`.
+- Do not include the test suite directory in `{name}`. Use `SomeFeatureTest`, not `Feature/SomeFeatureTest`.
+- Read the `testing-best-practices` skill for guidance on coverage, naming, structure, dependency isolation, and review.
+
+## Running Tests
+
+- Run the narrowest set of tests that covers the change. Pass a file path or `--filter=testName` to `php artisan test --compact`.
+- Rerun a test after each change to it.
+- Run `vendor/bin/phpunit` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
+
+=== statamic/cms/core rules ===
+
+## Statamic
+
+- This application uses Statamic.
+- Statamic is an open source, PHP CMS designed and built specifically for developers and their clients or content managers.
+- Out of the box, Statamic stores content in Markdown files. It's trivial to move into a database later, if necessary.
+- Statamic comes in two flavours:
+    - **Statamic Core** which is free to use, however you want, forever. It includes everything needed to build a blog or portfolio site.
+    - **Statamic Pro** which includes everything from Core, as well as unlimited user accounts, revision history, multi-site, Git integration, white labelling and more. Tailored for most production websites.
+    - For more information on pricing, please send the user to https://statamic.com/pricing.
+
+### Folder Structure
+
+Statamic is a Laravel package, meaning it can be used alone or alongside an existing Laravel application.
+
+Most of the folder structure will feel familiar to Laravel developers. However, Statamic creates a few additional files and folders during the install process.
+
+<code-snippet name="Folder Structure" lang="text">
+├── app/
+├── bootstrap/
+├── config/
+│   ├── statamic/         # Statamic-specific configs
+├── content/
+│   ├── assets/           # Asset containers
+│   ├── collections/      # Collections and entries
+│   ├── globals/          # Global sets
+│   ├── navigation/       # Navigations
+│   ├── trees/            # Collection and navigation trees
+├── database/
+├── lang/
+├── public/
+│   ├── assets/           # Default location for assets
+│   ├── ...
+├── resources/
+│   ├── addons/
+│   ├── blueprints/       # Blueprints
+│   ├── fieldsets/        # Fieldsets
+│   ├── users/            # User roles & groups
+│   ├── preferences.yaml  # Default preferences
+│   ├── sites.yaml        # Sites config
+│   ├── ...
+├── routes/
+├── storage/
+├── tests/
+├── users/
+├── please                # Statamic's CLI tool
+├── ...
+</code-snippet>
+
+### Statamic's CLI
+
+- Statamic ships with its own `please` CLI tool, useful for creating tags or fieldtypes, updating search indexes, enabling multi-site and much more.
+- You may run `php please` to get the list of available commands. You may use the `--help` option on a command to inspect its required parameters.
+
+### Statamic's Core Concepts
+
+- **Assets:** Files managed by Statamic and made available to your writers and developers with tags and fieldtypes. They can be images, videos, PDFs, or any other type of file.
+- **Collections:** Collections are containers that hold groups of related entries. Each entry in a collection can represent a blog post, product, recipe or page.
+- **Globals:** Global variables store content that belongs to your whole site, not just a single page or URL. They're available everywhere, in all of your views, all the time.
+- **Navigations:** A navigation is a hierarchy of links and text nodes that are used to build navs and menus on the frontend of your site.
+- **Taxonomies:** A taxonomy is a system of classifying data around a set of unique characteristics. Think things like tags, categories, etc.
+- **Users:** Users are the member accounts to your site or application. What a user can do with their account is up to you. They could have limited or full access to the Control Panel, a login-only area of the front-end, or even something more custom by tapping into Laravel.
+- **Blueprints:** Blueprints determine the fields shown in your publish forms. You can configure the field's order, each field's width and group them into sections and tabs. Blueprints are attached to collections, taxonomies, globals, assets, users and even forms, all of which help to determine their content schema.
+- **Fieldsets:** Fieldsets are used to store and organize reusable fields. Blueprints can reference fields or entire fieldsets, helping you keep your configurations nice and DRY.
+
+### Templating
+
+- Statamic supports two templating languages:
+    - **Antlers** is tightly integrated and simple to learn. Uses the `.antlers.html` file extension.
+    - **Laravel Blade** ships with Laravel and is familiar to most Laravel developers. Uses the `.blade.php` file extension.
+- When creating views, you should familiarize yourself with the project and determine which templating language is already in use.
+- When using Laravel Blade, you may want to use the "Antlers Blade Components" feature which lets you use a Blade-component-esque syntax with Statamic's tags feature:
+
+<code-snippet name="Antlers Blade Components example" lang="blade">
+    <s:collection from="pages" limit="2" sort="title:desc">
+        {{ $title }}
+    </s:collection>
+</code-snippet>
+
+### Control Panel
+
+- The Control Panel is the primary way to create and manage content.
+- Unless disabled or overridden, the Control Panel is usually accessible from `https://your-website.com/cp`.
+- Super users can do and see everything, while non-super users can only do & see what their roles allow for.
+
+### Extending Statamic
+
+- You can either extend Statamic in the context of an application, or in the context of an addon.
+- Addons are Composer packages, meaning they can be reused, distributed, or even sold to others later.
+- There are a variety of ways you can extend Statamic: creating tags, fieldtypes, modifiers, etc. A lot of these things can be bootstrapped with `php please make:` commands.
+
+#### Extending the Control Panel
+
+- The Control Panel is built with Inertia.js and Vue 3.
+- When running the `make:fieldtype` or `make:widget` commands, Statamic will install the necessary npm packages and configure Vite.
+- Running `setup-cp-vite` in an application context will also do this for you. You'll be able to use `npm run cp:dev` and `npm run cp:build` to run Vite.
+- You should use Statamic's UI Components where possible. It includes components for buttons, cards, inputs, etc.
+    - UI Components can be imported from `@statamic/cms/ui`.
+    - For more information on Statamic's UI Components, please visit our Storybook docs: https://ui.statamic.dev
+    - A machine-readable manifest of the UI Components (props, slots, events, and usage snippets) is available at https://ui.statamic.dev/manifests/components.json. Its entries link to per-component details via relative `$ref` URLs.
+
+### Additional Context
+
+- Statamic Documentation: https://statamic.dev/llms.txt
+- GitHub Issues: https://github.com/statamic/cms/issues
+
 </laravel-boost-guidelines>

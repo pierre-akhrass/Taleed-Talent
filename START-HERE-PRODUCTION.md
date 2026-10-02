@@ -54,6 +54,12 @@ Use the phase-specific messages in `docs/production/PHASE-PROMPTS.md`. Phase 1 b
 
 Request an actual working increment and actual test evidence at each phase. Do not accept “implemented” when a phase contains only a document, mock or TODO. “Not run” remains “Not run”. Allow scoped local implementation after approval without asking permission for every ordinary code edit. Cloud writes, live migrations, certificate/DNS changes, production email and deployment remain separately gated.
 
+## Local development commands
+
+On Windows, use `scripts/dev/dev.ps1` from the repository root. `init` copies the safe backend environment example only when no local `.env` exists, creates a local key only when it is blank, starts Compose, and applies pending migrations; `up` starts without migrating; `test` runs frontend checks in the pinned Node container and backend tests against the reserved synthetic-only `talent_test` schema, never the app database `talent`; `build` compiles the SPA into Laravel's `/app` directory; `reset-test` explicitly drops/recreates only `talent_test`; `down` stops services without deleting volumes. The script never resets the app database or changes the Windows hosts file or certificate trust store.
+
+The HTTPS development origin is `https://talent.taleed.test:9443`. Developers must separately map the hostname to loopback and install/trust Caddy's local root certificate using the operating system's approved process. Do not bypass TLS verification. No host trust or hosts-file changes were made as part of this implementation.
+
 ## Using Claude and Codex together
 
 First freeze the API/schema contract with one integration owner. Then use **separate Git worktrees, branches, Compose project names, database volumes and ports**, following `docs/production/PARALLEL-AGENTS.md`. Never have two agents edit the same checkout or run migrations against the same local database concurrently. The agents can swap backend/frontend roles; neither product needs a different architecture prompt.

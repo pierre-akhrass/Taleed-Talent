@@ -1,5 +1,7 @@
 # Taleed Talent & Team Development
 
+> **Historical prototype documentation.** This React SPA is now part of the Laravel/Statamic production application in this repository. The prototype-only setup, persona, localStorage, and deployment guidance below is not the production contract. Follow the repository-root `AGENTS.md`, `START-HERE-PRODUCTION.md`, and `docs/production/MASTER-PROMPT.md` for current work.
+
 **React + Redux Toolkit + TypeScript single-page prototype**  
 Prepared for **Fadi Zahhar** · 15 September 2026
 

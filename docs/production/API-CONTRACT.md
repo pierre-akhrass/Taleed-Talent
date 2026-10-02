@@ -1,6 +1,6 @@
 # Application API, authorization and consistency contract
 
-This is the proposed first API surface, not an API already implemented. Freeze an OpenAPI schema and shared TypeScript types after Phase 0. Use Laravel-owned routes and domain data, **not Statamic Pro's headless API**.
+This is the v1 application API contract. `contracts/openapi.yaml` freezes the identity/session and first Talent-domain request/response shapes. Identity/session and the Phase 3 catalogue/planning/scheduling/occurrence-note/closure/report-read slice are implemented locally. Source administration, conversations/well-being, private exports, and any other route not listed as implemented in the Phase 3 completion evidence remain future work; an OpenAPI declaration alone is not implementation evidence. Use Laravel-owned routes and domain data, **not Statamic Pro's headless API**.
 
 ## Authentication and common response rules
 
@@ -36,12 +36,13 @@ Separate grants may coexist for the same person; possessing a platform role neve
 | Session/profile | `GET /me`, `PATCH /me/preferences`, approved account/password operations | No all-users envelope; invalidate auth/cache state after security changes. |
 | Workspace | `POST /admin/organizations`, `GET /organizations/current`, `PATCH /organizations/current` | Admin creates the organization; no public self-registration or name/domain auto-join. |
 | Membership | `GET /organizations/current/members`, `POST /admin/organizations/{id}/invitations`, `POST /invitations/{id}/accept`, `POST /invitations/{id}/revoke` | Admin-created invitations target `leader` only; return only necessary member details; token not logged; correct verified account and atomic consumption. |
-| Catalogue | `GET /activities`, `GET /activities/{id}`, `GET /source-documents`, protected source download, bookmark commands | Published global plus authorized own custom content; retired source availability policy; no private storage URLs. |
-| Custom Develop | `POST /custom-activities`, versioned own edit/retire commands | Develop only, owner+tenant bound, clear authorship, no global publication. |
+| Catalogue | `GET /activities`, `GET /activities/{id}`, `GET /source-documents`, protected source download | Published global plus authorized own custom content; retired source availability policy; no private storage URLs. |
+| Custom Develop | `POST /custom-activities`, versioned `PATCH /custom-activities/{id}`, `POST /custom-activities/{id}/retire` | Develop only, owner+tenant bound, clear authorship, no global publication. |
+| Bookmarks | `GET /bookmarks`, `PUT/DELETE /activities/{id}/bookmark` | Caller-owned only; include only currently visible activities and recheck tenant/owner visibility. |
 | Drafts | `GET/POST /plan-drafts`, `GET/PATCH /plan-drafts/{id}`, `POST /plan-drafts/{id}/activate` | Partial save vs complete activation validation; expected version; Pick-3 authoritative server check. |
-| Plans | `GET /plans`, `GET /plans/{id}`, approved title/metadata patch, `POST /plans/{id}/commitments` | Owner only; permitted additions follow theme rules; closed plan mutation denied. |
+| Plans | `GET /plans`, `GET /plans/{id}`, `POST /plans/{id}/commitments` | Owner only; added work must be an owned custom Develop activity in a Develop plan; closed plan mutation denied. |
 | Schedules | `POST /commitments/{id}/schedule-versions` | Parent owner/tenant, explicit effective date, preserve history, concurrency/date-slot collision checks. |
-| Calendar | `GET /calendar?month=YYYY-MM`, `PATCH /occurrences/{id}`, `POST /occurrences/{id}/reschedule` | Owner-scoped bounded month; permitted state transition; completed/cancelled history rule and expected version. |
+| Calendar | `GET /calendar?month=YYYY-MM`, `PATCH /occurrences/{id}`, `PUT /occurrences/{id}/note`, `POST /occurrences/{id}/reschedule` | Owner-scoped bounded month; private note ciphertext, permitted state transition, completed/cancelled history rule, date collision and expected-version enforcement. |
 | Close/reopen | `POST /plans/{id}/close`, `POST /plans/{id}/reopen`, `GET /plans/{id}/closures` | Server snapshots; idempotent transaction; no client-submitted authoritative closure/metrics. |
 | Personal conversations | `GET/POST /conversations`, `GET/PATCH/DELETE /conversations/{id}`, `POST /conversations/{id}/complete` | Owner-only including list/count; feature/privacy gate, verified guide version, deletion/retention behavior. |
 | Personal wheel | `GET/POST /wellbeing`, `GET/PATCH/DELETE /wellbeing/{id}`, complete/revision commands | Owner-only, nine nullable integer ratings, rules version, explicit privacy gate, no classification until approved. |

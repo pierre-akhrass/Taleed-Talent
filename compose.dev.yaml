@@ -29,13 +29,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     working_dir: /app
-    command: php artisan serve --host=0.0.0.0 --port=8000
+    command: sh -c "cd public && exec php -S 0.0.0.0:8000 -t . ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
       APP_URL: https://talent.taleed.test:9443
       DB_CONNECTION: mysql
-      PHP_CLI_SERVER_WORKERS: 4
       DB_HOST: mysql
       DB_PORT: 3306
       DB_DATABASE: talent
@@ -56,6 +55,7 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - ./backend:/app
+      - ./contracts:/contracts:ro
 
   worker:
     build:
@@ -104,14 +104,15 @@ services:
       - ./backend:/app
 
   vite:
-    image: node:22.17.1
+    image: node:24.10.0-alpine@sha256:775ba24d35a13e74dedce1d2af4ad510337b68d8e22be89e0ce2ccc299329083
     working_dir: /workspace
-    command: sh -c "test -x node_modules/.bin/vite || npm ci; npm run dev"
+    command: sh scripts/start-vite.sh
     ports:
       - "127.0.0.1:5173:5173"
     volumes:
       - ./taleed-talent-spa:/workspace
-      - talent_node_modules:/workspace/node_modules
+      - ./contracts:/contracts:ro
+      - talent_node_modules_node24:/workspace/node_modules
 
   caddy:
     image: caddy:2.10
@@ -128,6 +129,6 @@ services:
 
 volumes:
   talent_mysql_data:
-  talent_node_modules:
+  talent_node_modules_node24:
   caddy_data:
   caddy_config:

@@ -11,7 +11,7 @@ export default defineConfig({
     hmr: {
       host: 'talent.taleed.test',
       protocol: 'wss',
-      port: 9443,
+      clientPort: 9443,
     },
   },
   test: { environment: 'jsdom', globals: true, setupFiles: ['./tests/setup.ts'], include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'] },
